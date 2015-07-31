@@ -3,7 +3,7 @@ package com.abc
 import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
-  "Customer" should "statement" in {
+  "Customer" should "testStatement" in {
     val checkingAccount: Account = new Account(Account.CHECKING)
     val savingsAccount: Account = new Account(Account.SAVINGS)
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
@@ -27,9 +27,38 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.numberOfAccounts should be(2)
   }
 
-  ignore should "testThreeAcounts" in {
+  //ignore should "testThreeAcounts" in {
+  
+  it should "testThreeAcounts" in {
     val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
     oscar.openAccount(new Account(Account.CHECKING))
+    oscar.openAccount(new Account(Account.MAXI_SAVINGS))
     oscar.numberOfAccounts should be(3)
   }
+  
+  //added test cases for intra account tranfer feature
+  
+  it should "testTransferBetweenAccounts:Checking to Savings" in {
+    val checkingAccount: Account = new Account(Account.CHECKING)
+    val savingsAccount: Account = new Account(Account.SAVINGS)
+    val john: Customer = new Customer("John").openAccount(checkingAccount).openAccount(savingsAccount)
+    checkingAccount.deposit(1200.0)
+    savingsAccount.deposit(4000.0)
+    checkingAccount.transfer(checkingAccount, savingsAccount, 500.0)
+    checkingAccount.sumTransactions() should be (700.0)
+    savingsAccount.sumTransactions() should be (4500.0)
+    john.accounts.map(_.sumTransactions()).sum should be (5200.0)
+  }
+  
+  it should "testTransferWithInsufficientFunds:Savings to Checking" in {
+    val checkingAccount: Account = new Account(Account.CHECKING)
+    val savingsAccount: Account = new Account(Account.SAVINGS)
+    val andrew: Customer = new Customer("Andrew").openAccount(checkingAccount).openAccount(savingsAccount)
+    checkingAccount.deposit(100.0)
+    savingsAccount.deposit(200.0)
+    intercept[IllegalArgumentException] {
+      savingsAccount.transfer(savingsAccount, checkingAccount, 250.0)    
+    }
+  }
+
 }
