@@ -13,7 +13,7 @@ class Bank {
     var summary: String = "Customer Summary"
     for (customer <- customers)
       summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+    summary    
   }
 
   private def format(number: Int, word: String): String = {
@@ -21,14 +21,20 @@ class Bank {
   }
 
   def totalInterestPaid: Double = {
+    /*
     var total: Double = 0
     for (c <- customers) total += c.totalInterestEarned
     return total
+    */
+    //replaced for loop with map function
+    customers.map(_.totalInterestEarned).sum
   }
 
+  /*
+  Not referenced anywhere in the code
   def getFirstCustomer: String = {
     try {
-      customers = null
+      //customers = null ??
       customers(0).name
     }
     catch {
@@ -38,7 +44,7 @@ class Bank {
       }
     }
   }
-
+  */
 }
 
 

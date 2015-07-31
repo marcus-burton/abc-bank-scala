@@ -42,12 +42,13 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     accountType + transactionSummary + totalSummary
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
+  private def withdrawalOrDepositText(t: Transaction) = {
     t.amount match {
       case a if a < 0 => "withdrawal"
       case a if a > 0 => "deposit"
       case _ => "N/A"
     }
+  }  
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 }
