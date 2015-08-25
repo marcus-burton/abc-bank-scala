@@ -1,5 +1,7 @@
 package com.abc
 
+import org.joda.time.DateTime
+
 import scala.collection.mutable.ListBuffer
 
 object Helpers {
@@ -15,5 +17,9 @@ object Helpers {
       case None => false
     }
   }
+
+  def getDailyRate(APR: Double, d: DateTime) = APR / daysInYear(d)
+
+  def daysInYear(d: DateTime) = if (d.year.isLeap) 366 else 365
 
 }

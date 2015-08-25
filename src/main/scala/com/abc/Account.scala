@@ -1,6 +1,7 @@
 package com.abc
 
 import com.abc.Helpers._
+import org.joda.time.DateTime
 
 import scala.collection.mutable.ListBuffer
 
@@ -30,8 +31,6 @@ class Account(val accountType: AccountType, var transactions: ListBuffer[Transac
 
   def interestEarned = accountType.calculateInterest(sumTransactions, recentWithdrawal)
 
-  def sumTransactions = transactions.map(_.amount).sum
-
   private def recentWithdrawal: Option[Boolean] = {
     accountType match {
       case MAXI_SAVINGS_PLUS => Some(recentWithdrawalOccurred(transactions, 10))
@@ -43,7 +42,26 @@ class Account(val accountType: AccountType, var transactions: ListBuffer[Transac
 
   private def transactionSummary = transactions.map(t => t.transactionType + " " + toDollars(t.amount.abs)).mkString("  ", "\n  ", "\n")
 
-  private def totalSummary = s"Total ${toDollars(transactions.map(_.amount).sum)}"
+  private def totalSummary = s"Total ${toDollars(sumTransactions)}"
 
+  def sumTransactions = transactions.map(_.amount).sum
+
+  def calculateInterestWithDailyAccrual: Double = {
+
+    var date = new DateTime(transactions.head.transactionDate)
+    var balanceAcc = 0d
+    var transactionsAcc = 0d
+
+    while (date.isBeforeNow()) {
+      val transactionAmount = transactions.filter(t => t.transactionDate == date.toDate).map(_.amount).sum
+      transactionsAcc += transactionAmount
+      balanceAcc += transactionAmount
+      balanceAcc = balanceAcc + (balanceAcc * getDailyRate(0.001, date))
+      date = date.plusDays(1)
+    }
+
+    balanceAcc - transactionsAcc
+
+  }
 }
 
