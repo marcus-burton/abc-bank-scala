@@ -8,8 +8,9 @@ object Helpers {
 
   def plurialize(number: Int, word: String): String = if (number == 1) word else word + "s"
 
-  def recentTransactionsOccured(transactions: ListBuffer[Transaction], periodInDays: Integer): Boolean = {
-    transactions.map(t => DateProvider.dateOccurredLessThan(t.transactionDate, periodInDays)).find(d => d) match {
+  def recentWithdrawalOccurred(transactions: ListBuffer[Transaction], periodInDays: Integer): Boolean = {
+    transactions.map(t => t.transactionType == "withdrawal" && DateProvider.dateOccurredLessThan(t.transactionDate, periodInDays)
+    ).find(d => d) match {
       case Some(x) => true
       case None => false
     }

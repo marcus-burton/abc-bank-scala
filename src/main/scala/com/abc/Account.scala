@@ -28,13 +28,13 @@ class Account(val accountType: AccountType, var transactions: ListBuffer[Transac
       transactions += TransactionImpl(-amount)
   }
 
-  def interestEarned = accountType.calculateInterest(sumTransactions, hadActivityInLast10Days)
+  def interestEarned = accountType.calculateInterest(sumTransactions, recentWithdrawal)
 
   def sumTransactions = transactions.map(_.amount).sum
 
-  private def hadActivityInLast10Days: Option[Boolean] = {
+  private def recentWithdrawal: Option[Boolean] = {
     accountType match {
-      case MAXI_SAVINGS_PLUS => Some(recentTransactionsOccured(transactions, 10))
+      case MAXI_SAVINGS_PLUS => Some(recentWithdrawalOccurred(transactions, 10))
       case _ => None
     }
   }
