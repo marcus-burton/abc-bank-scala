@@ -11,6 +11,8 @@ case object CHECKING extends AccountType {
   override def toString = "Checking Account"
 
   def calculateInterest(balance: Double, recentWithdrawal: Option[Boolean]) = balance * 0.001
+
+
 }
 
 case object SAVINGS extends AccountType {

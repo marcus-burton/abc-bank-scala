@@ -6,6 +6,14 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class AccountTest extends FlatSpec with Matchers {
 
+  val cal1 = Calendar.getInstance()
+  cal1.add(Calendar.DAY_OF_MONTH, -60)
+  val twoMonthAgo = cal1.getTime
+
+  val cal2 = Calendar.getInstance()
+  cal2.add(Calendar.DAY_OF_MONTH, -30)
+  val oneMonthAgo = cal2.getTime
+
   "MaxiSavingsAccount" should "have 5% interest with recent activity" in {
     val msp = new Account(MAXI_SAVINGS_PLUS)
     msp.deposit(100.0)
@@ -14,17 +22,8 @@ class AccountTest extends FlatSpec with Matchers {
     msp.interestEarned should be(50)
   }
 
-  "MaxiSavingsAccount" should "have 0.01% interest with recent transactions" in {
+  "MaxiSavingsAccount" should "have 0.01% interest after recent withdrawal" in {
     val msp = new Account(MAXI_SAVINGS_PLUS)
-
-    val cal1 = Calendar.getInstance()
-    cal1.add(Calendar.DAY_OF_MONTH, -60)
-    val twoMonthAgo = cal1.getTime
-
-
-    val cal2 = Calendar.getInstance()
-    cal2.add(Calendar.DAY_OF_MONTH, -30)
-    val oneMonthAgo = cal2.getTime
 
     val tt1: Transaction = new TransactionTestImpl(2000, twoMonthAgo)
     msp.transactions += tt1
@@ -40,5 +39,14 @@ class AccountTest extends FlatSpec with Matchers {
     msp.withdraw(100)
     msp.interestEarned should be(1.0)
   }
+
+  "CheckingAccount" should "have a lower interest earned on one month with dailyAccrual " in {
+    val c = new Account(CHECKING)
+    val tt1: Transaction = new TransactionTestImpl(1000, twoMonthAgo)
+    c.transactions += tt1
+    c.calculateInterestWithDailyAccrual should be(0.1671370245720709)
+  }
+
+
 
 }
