@@ -1,44 +1,67 @@
 package com.abc
 
+import com.abc.Helpers._
+import org.joda.time.DateTime
+
 import scala.collection.mutable.ListBuffer
 
-object Account {
-  final val CHECKING: Int = 0
-  final val SAVINGS: Int = 1
-  final val MAXI_SAVINGS: Int = 2
-}
+class Account(val accountType: AccountType, var transactions: ListBuffer[Transaction] = ListBuffer()) {
 
-class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = ListBuffer()) {
+
+  def transferTo(to: Account, amount: Double) {
+    withdraw(amount)
+    to.deposit(amount)
+  }
 
   def deposit(amount: Double) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
-      transactions += Transaction(amount)
+      transactions += TransactionImpl(amount)
   }
 
   def withdraw(amount: Double) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
+    else if (amount >= sumTransactions)
+      throw new UnsupportedOperationException("unsufficient funds")
     else
-      transactions += Transaction(-amount)
+      transactions += TransactionImpl(-amount)
   }
 
-  def interestEarned: Double = {
-    val amount: Double = sumTransactions()
+  def interestEarned = accountType.calculateInterest(sumTransactions, recentWithdrawal)
+
+  private def recentWithdrawal: Option[Boolean] = {
     accountType match {
-      case Account.SAVINGS =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
-      case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) return amount * 0.02
-        if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-        70 + (amount - 2000) * 0.1
-      case _ =>
-        amount * 0.001
+      case MAXI_SAVINGS_PLUS => Some(recentWithdrawalOccurred(transactions, 10))
+      case _ => None
     }
   }
 
-  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
+  def statement = accountType + "\n" + transactionSummary + totalSummary
 
+  private def transactionSummary = transactions.map(t => t.transactionType + " " + toDollars(t.amount.abs)).mkString("  ", "\n  ", "\n")
+
+  private def totalSummary = s"Total ${toDollars(sumTransactions)}"
+
+  def sumTransactions = transactions.map(_.amount).sum
+
+  def calculateInterestWithDailyAccrual: Double = {
+
+    var date = new DateTime(transactions.head.transactionDate)
+    var balanceAcc = 0d
+    var transactionsAcc = 0d
+
+    while (date.isBeforeNow()) {
+      val transactionAmount = transactions.filter(t => t.transactionDate == date.toDate).map(_.amount).sum
+      transactionsAcc += transactionAmount
+      balanceAcc += transactionAmount
+      balanceAcc = balanceAcc + (balanceAcc * getDailyRate(0.001, date))
+      date = date.plusDays(1)
+    }
+
+    balanceAcc - transactionsAcc
+
+  }
 }
+
