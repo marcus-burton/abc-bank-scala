@@ -1,7 +1,7 @@
 package com.abc
 
 import scala.collection.mutable.ArrayBuffer
-
+import java.math.BigDecimal
 object Account {
   final val CHECKING: Int = 0
   final val SAVINGS: Int = 1
@@ -48,26 +48,29 @@ val balance:AtomicDouble=new AtomicDouble(0)
     val amount: Double = sumTransactions()
     accountType match {
       case Account.SAVINGS =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
-        /**
-      case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) return amount * 0.02
-        if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-        70 + (amount - 2000) * 0.1
-        
-        */
+        if (amount <= 1000) amount * calculateDailyInterest(0.001)
+        else 1 + (amount - 1000) * calculateDailyInterest(0.002)
+     
       case Account.MAXI_SAVINGS => 
         if(checkWithdrawalsInLastTenDays){
-          return amount * 0.001
+          return amount * calculateDailyInterest(0.001)
         }
         else {
-          amount * 0.05
+          amount * calculateDailyInterest(0.05)
         }
       case Account.CHECKING =>
-        amount * 0.001
+        amount * calculateDailyInterest(0.001)
     }
   }
+  /**
+   * Accrue daily interest using formula
+   * (e ^ r -1)
+   */
+  def calculateDailyInterest(rate:Double):Double= {
+    return Math.pow(Math.E,rate)-1.0;
+    
+  }
+  
   def checkWithdrawalsInLastTenDays():Boolean ={
     val dateProvider:DateProvider =new DateProvider()
     for(txn <- transactions){

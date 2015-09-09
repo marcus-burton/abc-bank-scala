@@ -17,7 +17,7 @@ class BankTest extends FlatSpec with Matchers {
     val bill: Customer = new Customer("Bill").openAccount(checkingAccount)
     bank.addCustomer(bill)
     checkingAccount.deposit(100.0)
-    bank.totalInterestPaid should be(0.1)
+    bank.totalInterestPaid should be(0.10005001667083846)
   }
 
   it should "savings account" in {
@@ -25,7 +25,7 @@ class BankTest extends FlatSpec with Matchers {
     val savingsAccount: Account = new Account(Account.SAVINGS)
     bank.addCustomer(new Customer("Bill").openAccount(savingsAccount))
     savingsAccount.deposit(1500.0)
-    bank.totalInterestPaid should be(2.0)
+    bank.totalInterestPaid should be(2.0010006670001514)
   }
 
   it should "maxi savings account" in {
@@ -33,7 +33,7 @@ class BankTest extends FlatSpec with Matchers {
     val maxiSavingsAccount: Account = new Account(Account.MAXI_SAVINGS)
     bank.addCustomer(new Customer("Bill").openAccount(maxiSavingsAccount))
     maxiSavingsAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(150.0)
+    bank.totalInterestPaid should be(153.81328912807234)
   }
   it should "transfer from checking account to savings account" in {
     val bank: Bank = new Bank
@@ -42,7 +42,7 @@ class BankTest extends FlatSpec with Matchers {
     bank.addCustomer(new Customer("Bill").openAccount(savingsAccount).openAccount(checkingAccount))
     checkingAccount.deposit(3000.0)
     savingsAccount.transfer(checkingAccount, 1000)
-    bank.totalInterestPaid should be(3.0)
+    bank.totalInterestPaid should be(3.001500500125154)
   }  
 
 }
