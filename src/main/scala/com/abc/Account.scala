@@ -1,11 +1,11 @@
 package com.abc
 
 import scala.collection.mutable.ArrayBuffer
-import java.math.BigDecimal
+import org.joda.time.LocalDate
 object Account {
-  final val CHECKING: Int = 0
-  final val SAVINGS: Int = 1
-  final val MAXI_SAVINGS: Int = 2
+   val CHECKING: Int = 0
+  val SAVINGS: Int = 1
+  val MAXI_SAVINGS: Int = 2
 }
 
 case class Account(val accountType: Int, val transactions: ArrayBuffer[Transaction] = ArrayBuffer()) {
@@ -25,20 +25,18 @@ val balance:AtomicDouble=new AtomicDouble(0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else {
       this.synchronized{
-      transactions += new Transaction(amount)
+      transactions += new Transaction(accountType,amount)
       }
       balance.addAndGet(amount)
     }
   }
 
   def withdraw(amount: Double) {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
     if(balance.doubleValue()  -amount <= 0)
       throw new InsufficientFundsException();
     else {
       this.synchronized {
-      transactions += new Transaction(-amount)
+      transactions += new Transaction(accountType,-amount)
       } 
       balance.addAndGet(-amount)
     }
