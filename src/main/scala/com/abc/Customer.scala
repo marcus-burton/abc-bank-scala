@@ -1,11 +1,13 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+class Customer(val name: String, var accounts: ArrayBuffer[Account] = ArrayBuffer()) {
 
   def openAccount(account: Account): Customer = {
+    synchronized {
     accounts += account
+    }
     this
   }
 
@@ -17,6 +19,8 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
    * This method gets a statement
    */
   def getStatement: String = {
+    synchronized 
+    {
     //JIRA-123 Change by Joe Bloggs 29/7/1988 start
     var statement: String = null //reset statement to null here
     //JIRA-123 Change by Joe Bloggs 29/7/1988 end
@@ -24,7 +28,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     statement = f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
+    
     statement
+    }
   }
 
   private def statementForAccount(a: Account): String = {
