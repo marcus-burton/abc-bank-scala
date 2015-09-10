@@ -28,8 +28,6 @@ class CustomerTest extends FlatSpec with Matchers {
   }
 
   it should "transfer between accounts" in {
-    // henry.accounts.indexOf(savingsAccount)
-    // henry.accounts(meh).sumTransactions()
     val checkingAccount: Account = new Account(Checking)
     val savingsAccount: Account = new Account(Savings)
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
