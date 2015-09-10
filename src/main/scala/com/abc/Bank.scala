@@ -1,19 +1,25 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 
 class Bank {
-  var customers = new ListBuffer[Customer]
+  val customers = new ArrayBuffer[Customer]
 
   def addCustomer(customer: Customer) {
     customers += customer
   }
 
   def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+    val summary:String ="Customer Summary"
+    val summaryBuilder:StringBuilder=new StringBuilder()
+   
+     for (customer <- customers){
+      summaryBuilder.append(summary)
+      summaryBuilder.append("\n - ")
+      summaryBuilder.append(customer.name + " (" + format(customer.numberOfAccounts, "account") + ")")
+     }
+    println("Customer summary="+summary.toString())
+    summaryBuilder.toString()
   }
 
   private def format(number: Int, word: String): String = {
@@ -28,7 +34,6 @@ class Bank {
 
   def getFirstCustomer: String = {
     try {
-      customers = null
       customers(0).name
     }
     catch {
