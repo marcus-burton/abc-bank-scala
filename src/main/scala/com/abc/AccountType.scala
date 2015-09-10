@@ -18,8 +18,8 @@ trait AccountType {
 
 case object Savings extends AccountType {
   def interestCalc(amount: Double, days: Int, recentTrans: Option[Boolean]) = {
-    if (amount <= 1000) amount * accruedInterest(Interest.SAVINGS_FIRST_K, days)  //Interest.SAVINGS_FIRST_K
-    else (1000 * accruedInterest(Interest.SAVINGS_FIRST_K, days)) + ((amount - 1000) * accruedInterest(Interest.SAVINGS, days)) //1 + (amount - 1000) * Interest.SAVINGS
+    if (amount <= 1000) amount * accruedInterest(Interest.SAVINGS_FIRST_K, days)
+    else (1000 * accruedInterest(Interest.SAVINGS_FIRST_K, days)) + ((amount - 1000) * accruedInterest(Interest.SAVINGS, days))
   }
 
   override def toString() = "Savings Account"
@@ -28,8 +28,8 @@ case object Savings extends AccountType {
 case object MaxiSavings extends AccountType {
   def interestCalc(amount: Double, days: Int, recentTrans: Option[Boolean]): Double = {
     recentTrans match {
-      case Some(hadRecentTransaction) if hadRecentTransaction => amount * accruedInterest(0.001, days)
-      case _ => amount * accruedInterest(0.05, days)
+      case Some(hadRecentTransaction) if hadRecentTransaction => amount * accruedInterest(Interest.MAXI_SAVINGS_WITHDRAWAL, days)
+      case _ => amount * accruedInterest(Interest.MAXI_SAVINGS, days)
     }
   }
 
@@ -39,8 +39,8 @@ case object MaxiSavings extends AccountType {
 case object MaxiSavingsPlus extends AccountType {
   def interestCalc(amount: Double, days: Int, recentTrans: Option[Boolean]): Double = {
     recentTrans match {
-      case Some(hadRecentTransaction) if hadRecentTransaction => amount * accruedInterest(0.001, days)
-      case _ => amount * accruedInterest(0.05, days)
+      case Some(hadRecentTransaction) if hadRecentTransaction => amount * accruedInterest(Interest.MAXI_SAVINGS_WITHDRAWAL, days)
+      case _ => amount * accruedInterest(Interest.MAXI_SAVINGS, days)
     }
   }
 
@@ -49,7 +49,6 @@ case object MaxiSavingsPlus extends AccountType {
 
 case object Checking extends AccountType {
   def interestCalc(amount: Double, days: Int, recentTrans: Option[Boolean]) = amount * accruedInterest(Interest.CHECKING, days)
-  //amount * Interest.CHECKING
 
   override def toString() = "Checking Account"
 }
