@@ -7,4 +7,10 @@ class TransactionTest extends FlatSpec with Matchers {
     val t = new Transaction(5)
     t.isInstanceOf[Transaction] should be(true)
   }
+
+  it should "be a deposit" in {
+    val t = Transaction(-5)
+    t.transactionType should be("withdrawal")
+  }
+
 }
