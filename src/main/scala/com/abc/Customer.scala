@@ -11,8 +11,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned: Double = accounts.map(_.interestEarned()).sum
 
+  def totalInterestEarnedByYear: Double = accounts.map(_.interestEarnedByYear).sum
   /**
    * This method gets a statement
    */
@@ -50,5 +51,16 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
+  
+  def transfer(fromAccount: Account, toAccount: Account, amount: Double): Customer = {
+    this.synchronized  {
+      fromAccount.withdraw(amount)
+      toAccount.deposit(amount)    
+    }
+     this
+  }
+  
+  def upgradeSavingsAccounts =  for (a <- accounts) a.upgradeSavingAccount()
+     
 }
 
