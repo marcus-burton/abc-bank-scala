@@ -1,8 +1,14 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+import java.util.ArrayList
+import java.util.Collections
+import java.util.{ List => JList }
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.asScalaIterator
+import scala.util.Try
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+class Customer(val name: String,
+               val accounts: JList[Account] = Collections.synchronizedList(new ArrayList[Account]())) {
 
   def openAccount(account: Account): Customer = {
     accounts += account
@@ -11,34 +17,38 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned: Double = accounts.synchronized { accounts.iterator.map(_.interestEarned).sum }
 
   /**
    * This method gets a statement
    */
   def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 start
-    var statement: String = null //reset statement to null here
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 end
-    val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
-    statement = f"Statement for $name\n" +
-      accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
-      s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
-    statement
+    val (accountsStr, totalAcrossAllAccounts) = accounts.iterator.foldLeft("", 0.0) {
+      case ((accStr, accTotal), account) =>
+        (accStr + "\n\n" + statementForAccount(account),
+          accTotal + account.sumTransactions())
+    }
+    f"Statement for $name" + accountsStr + s"\n\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
+  }
+
+  def transfer(fromAccount: Account, toAccount: Account, amount: Double): Try[Unit] = {
+    Try(fromAccount.withdraw(amount)).map { _ =>
+      toAccount.deposit(amount)
+    }
   }
 
   private def statementForAccount(a: Account): String = {
-    val accountType = a.accountType match {
-      case Account.CHECKING =>
+    val accountType = a match {
+      case CheckingAccount() =>
         "Checking Account\n"
-      case Account.SAVINGS =>
+      case SavingsAccount() =>
         "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
+      case MaxiSavingsAccount() =>
         "Maxi Savings Account\n"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
-      .mkString("  ", "\n  ", "\n")
-    val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
+    val f = { t: Transaction => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs) }
+    val transactionSummary = a.transactionSummary(f, "  ", "\n  ", "\n")
+    val totalSummary = s"Total ${toDollars(a.sumTransactions())}"
     accountType + transactionSummary + totalSummary
   }
 
@@ -46,7 +56,7 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     t.amount match {
       case a if a < 0 => "withdrawal"
       case a if a > 0 => "deposit"
-      case _ => "N/A"
+      case _          => "N/A"
     }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"

@@ -1,44 +1,42 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+import java.util.ArrayList
+import java.util.Collections
+
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.asScalaIterator
 
 class Bank {
-  var customers = new ListBuffer[Customer]
+  val customers = Collections.synchronizedList(new ArrayList[Customer]())
 
-  def addCustomer(customer: Customer) {
+  def addCustomer(customer: Customer): Unit = {
     customers += customer
   }
 
-  def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+  def customerSummary: String = customers.synchronized {
+    "Customer Summary" +
+      customers.iterator.map { c =>
+        "\n - " + c.name + " (" + format(c.numberOfAccounts, "account") + ")"
+      }.mkString
   }
 
   private def format(number: Int, word: String): String = {
     number + " " + (if (number == 1) word else word + "s")
   }
 
-  def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+  def totalInterestPaid: Double = customers.synchronized {
+    customers.iterator.map { _.totalInterestEarned }.sum
   }
 
-  def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
+  def accrueInterest(): Unit = customers.synchronized {
+    customers.foreach { c =>
+      c.accounts.synchronized {
+        c.accounts.foreach(a => a.accrueInterst)
       }
     }
   }
 
+  def getFirstCustomer: Option[String] = customers.headOption.map(_.name)
 }
 
 

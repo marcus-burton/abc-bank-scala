@@ -2,19 +2,11 @@ package com.abc
 
 import java.util.Calendar
 import java.util.Date
+import java.util.GregorianCalendar
 
 object DateProvider {
-  def getInstance: DateProvider = {
-    if (instance == null) instance = new DateProvider
-    instance
-  }
+  val gregCal = new GregorianCalendar()
+  def now = Calendar.getInstance.getTime
 
-  private var instance: DateProvider = null
+  def isLeapYear: Boolean = gregCal.isLeapYear(Calendar.getInstance.get(Calendar.YEAR))
 }
-
-class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
-  }
-}
-
