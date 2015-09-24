@@ -1,6 +1,7 @@
 package com.abc
 
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{ Matchers, FlatSpec }
+import scala.util.Failure
 
 class CustomerTest extends FlatSpec with Matchers {
   "Customer" should "statement" in {
@@ -25,6 +26,30 @@ class CustomerTest extends FlatSpec with Matchers {
     val oscar: Customer = new Customer("Oscar").openAccount(SavingsAccount())
     oscar.openAccount(CheckingAccount())
     oscar.numberOfAccounts should be(2)
+  }
+
+  it should "transfer successfully" in {
+    val checkingAccount = CheckingAccount()
+    val savingsAccount = SavingsAccount()
+    val oscar: Customer = new Customer("Oscar").openAccount(savingsAccount)
+    oscar.openAccount(checkingAccount)
+    checkingAccount.deposit(1000)
+    savingsAccount.deposit(1000)
+    oscar.transfer(checkingAccount, savingsAccount, 500)
+    checkingAccount.sumTransactions() should be(500)
+    savingsAccount.sumTransactions() should be(1500)
+  }
+
+  it should "fail a transfer" in {
+    val checkingAccount = CheckingAccount()
+    val savingsAccount = SavingsAccount()
+    val oscar: Customer = new Customer("Oscar").openAccount(savingsAccount)
+    oscar.openAccount(checkingAccount)
+    checkingAccount.deposit(1000)
+    savingsAccount.deposit(1000)
+    intercept[IllegalArgumentException] {
+      oscar.transfer(checkingAccount, savingsAccount, -1500).get
+    }
   }
 
   ignore should "testThreeAcounts" in {

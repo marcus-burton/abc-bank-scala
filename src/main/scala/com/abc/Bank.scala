@@ -28,6 +28,14 @@ class Bank {
     customers.iterator.map { _.totalInterestEarned }.sum
   }
 
+  def accrueInterest(): Unit = customers.synchronized {
+    customers.foreach { c =>
+      c.accounts.synchronized {
+        c.accounts.foreach(a => a.accrueInterst)
+      }
+    }
+  }
+
   def getFirstCustomer: Option[String] = customers.headOption.map(_.name)
 }
 

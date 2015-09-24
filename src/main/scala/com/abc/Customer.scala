@@ -3,9 +3,9 @@ package com.abc
 import java.util.ArrayList
 import java.util.Collections
 import java.util.{ List => JList }
-
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.asScalaIterator
+import scala.util.Try
 
 class Customer(val name: String,
                val accounts: JList[Account] = Collections.synchronizedList(new ArrayList[Account]())) {
@@ -29,6 +29,12 @@ class Customer(val name: String,
           accTotal + account.sumTransactions())
     }
     f"Statement for $name" + accountsStr + s"\n\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
+  }
+
+  def transfer(fromAccount: Account, toAccount: Account, amount: Double): Try[Unit] = {
+    Try(fromAccount.withdraw(amount)).map { _ =>
+      toAccount.deposit(amount)
+    }
   }
 
   private def statementForAccount(a: Account): String = {

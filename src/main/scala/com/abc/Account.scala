@@ -23,7 +23,15 @@ sealed trait Account {
       transactions += Transaction(-amount)
   }
 
-  def interestEarned: Double
+  def interestEarned: Double = transactions.synchronized {
+    transactions.iterator.filter(_.interestAccrural).map(_.amount).sum
+  }
+
+  def interestFunction: Double => Double
+
+  def interestEarnedDaily: Double = interestFunction(sumTransactions()) / (if (DateProvider.isLeapYear) 366 else 365)
+
+  def accrueInterst: Unit = transactions += Transaction(interestEarnedDaily, true)
 
   def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.synchronized {
     transactions.iterator.map(_.amount).sum
@@ -38,22 +46,20 @@ sealed trait Account {
 }
 
 case class CheckingAccount() extends Account {
-  def interestEarned: Double = sumTransactions() * 0.001
+  def interestFunction = { amount: Double => 0.001 * amount }
 }
 
 case class SavingsAccount() extends Account {
-  def interestEarned: Double = {
-    val amount = sumTransactions()
+  def interestFunction = { amount: Double =>
     if (amount <= 1000) amount * 0.001
     else 1 + (amount - 1000) * 0.002
   }
 }
 
 case class MaxiSavingsAccount() extends Account {
-  def interestEarned: Double = {
-    val amount = sumTransactions()
-    if (amount <= 1000) return amount * 0.02
-    if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-    70 + (amount - 2000) * 0.1
+  def interestFunction = { amount: Double =>
+    if (amount <= 1000) amount * 0.02
+    else if (amount <= 2000) 20 + (amount - 1000) * 0.05
+    else 70 + (amount - 2000) * 0.1
   }
 }

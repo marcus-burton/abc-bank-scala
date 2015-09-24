@@ -1,6 +1,6 @@
 package com.abc
 
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{ Matchers, FlatSpec }
 
 class BankTest extends FlatSpec with Matchers {
 
@@ -11,13 +11,16 @@ class BankTest extends FlatSpec with Matchers {
     bank.customerSummary should be("Customer Summary\n - John (1 account)")
   }
 
+  val days = if(DateProvider.isLeapYear) 366 else 365
+
   it should "checking account" in {
     val bank: Bank = new Bank
     val checkingAccount: Account = CheckingAccount()
     val bill: Customer = new Customer("Bill").openAccount(checkingAccount)
     bank.addCustomer(bill)
-    checkingAccount.deposit(100.0)
-    bank.totalInterestPaid should be(0.1)
+    checkingAccount.deposit(1000.0)
+    checkingAccount.accrueInterst
+    bank.totalInterestPaid should be(1.0/days)
   }
 
   it should "savings account" in {
@@ -25,7 +28,8 @@ class BankTest extends FlatSpec with Matchers {
     val checkingAccount: Account = SavingsAccount()
     bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(1500.0)
-    bank.totalInterestPaid should be(2.0)
+    checkingAccount.accrueInterst
+    bank.totalInterestPaid should be(2.0/days)
   }
 
   it should "maxi savings account" in {
@@ -33,7 +37,8 @@ class BankTest extends FlatSpec with Matchers {
     val checkingAccount: Account = MaxiSavingsAccount()
     bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(170.0)
+    checkingAccount.accrueInterst
+    bank.totalInterestPaid should be(170.0/days)
   }
 
 }
