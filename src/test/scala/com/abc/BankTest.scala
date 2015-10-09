@@ -36,4 +36,25 @@ class BankTest extends FlatSpec with Matchers {
     bank.totalInterestPaid should be(170.0)
   }
 
+  it should "reject negative deposit" in {
+    val bank: Bank = new Bank
+    val checkingAccount: Account = new Account(MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val failMessage = checkingAccount.deposit(-100.0) match {
+      case Left(msg) => msg
+      case Right(_) => "NOPE"
+    }
+    failMessage should be("amount must be greater than zero")
+  }
+
+  it should "reject negative withdrawal" in {
+    val bank: Bank = new Bank
+    val checkingAccount: Account = new Account(MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val failMessage = checkingAccount.withdraw(-100.0) match {
+      case Left(msg) => msg
+      case Right(_) => "NOPE"
+    }
+    failMessage should be("amount must be greater than zero")
+  }
 }

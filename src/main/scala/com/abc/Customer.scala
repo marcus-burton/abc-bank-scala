@@ -1,5 +1,6 @@
 package com.abc
 
+// could make accounts a concurrent Hashmap, immutable data structures are nice though  :)
 case class Customer(name: String, accounts: Map[AccountType, Account] = Map.empty[AccountType, Account]) {
 
   def openAccount(account: Account): Customer =
@@ -34,7 +35,7 @@ case class Customer(name: String, accounts: Map[AccountType, Account] = Map.empt
     val transactionSummary = account.transactionSummary(formatter)
     val totalDollars = toDollars(account.sumTransactions())
     val totalSummary = s"Total ${totalDollars}"
-    accountType + transactionSummary + totalSummary
+    s"$accountType$transactionSummary$totalSummary"
   }
 
   private def withdrawalOrDepositText(t: Transaction) =

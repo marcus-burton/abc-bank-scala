@@ -18,7 +18,8 @@ class Bank {
   }
 
   private def format(number: Int, word: String): String = {
-    number + " " + (if (number == 1) word else word + "s")
+    val pluralizedWord = if (number == 1) word else word + "s"
+    s"$number $pluralizedWord"
   }
 
   def totalInterestPaid: Double = customers.synchronized {
@@ -27,6 +28,7 @@ class Bank {
     }
   }
 
+  // ok I changed it a bit since I like functions that work on empty lists
   def getFirstCustomer: Option[String] = customers.synchronized {
     customers.asScala.headOption.map(_.name)
   }

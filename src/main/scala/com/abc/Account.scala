@@ -10,21 +10,24 @@ case object MAXI_SAVINGS extends AccountType("maxi_savings")
 
 class Account(val accountType: AccountType) {
 
+  // By way of discussion real data would be stored somewhere on disk/not just in memory
+  // When keeping a representation in memory the nice scala-ish thing to do is use immutable data structures
+  // When data needs to be updated your options include using java synchronization methods, or using akka...
+  // Using some kind of explicit synchronization is the smallest departure from whats here already.
+  // Disclaimer: I haven't used scala conversions/syntactic sugar on of java synchronization wrappers before this.
   val transactions = JavaCollections.synchronizedList(new ArrayList[Transaction]())
 
-  def deposit(amount: Double): Unit = {
+  def deposit(amount: Double): Either[String, Boolean] =
     if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
+      Left("amount must be greater than zero")
     else
-      transactions.add(Transaction(amount))
-  }
+      Right(transactions.add(Transaction(amount)))
 
-  def withdraw(amount: Double): Unit = {
+  def withdraw(amount: Double): Either[String, Boolean] =
     if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
+      Left("amount must be greater than zero")
     else
-      transactions.add(Transaction(-amount))
-  }
+      Right(transactions.add(Transaction(-amount)))
 
   def interestEarned: Double = {
     val amount: Double = sumTransactions()
