@@ -18,8 +18,8 @@ class Bank {
   }
 
   private def format(number: Int, word: String): String = {
-    val pluralizedWord = if (number == 1) word else word + "s"
-    s"$number $pluralizedWord"
+    val plural = if (number == 1) "" else "s"
+    s"$number $word$plural"
   }
 
   def totalInterestPaid: Double = customers.synchronized {
