@@ -1,11 +1,9 @@
 package com.abc
 
-import java.util.Calendar
-import java.util.Date
+import java.time.Instant
 
 object DateProvider {
-  lazy val calendarInstance = Calendar.getInstance
-  def now: Date = calendarInstance.getTime
+  def now: Instant = Instant.now
 }
 
 
