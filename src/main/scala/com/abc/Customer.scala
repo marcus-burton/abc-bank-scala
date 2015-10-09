@@ -38,12 +38,13 @@ case class Customer(name: String, accounts: Map[AccountType, Account] = Map.empt
     s"$accountType$transactionSummary$totalSummary"
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
-    t.amount match {
-      case a if a < 0 => "withdrawal"
-      case a if a > 0 => "deposit"
-      case _ => "N/A" // this is a bit worrying since you've got a bigger problem!
-    }
+  private def withdrawalOrDepositText(t: Transaction): String =
+    if (t.amount < 0)
+      "withdrawal"
+    else if (t.amount > 0)
+      "deposit"
+    else
+      "N/A" // this is a bit worrying since you've got a bigger problem!
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 }
