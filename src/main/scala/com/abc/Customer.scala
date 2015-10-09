@@ -1,53 +1,50 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+// could make accounts a concurrent Hashmap, immutable data structures are nice though  :)
+case class Customer(name: String, accounts: Set[Account] = Set.empty[Account]) {
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+  def openAccount(account: Account): Customer =
+    if (accounts.contains(account))
+      throw new IllegalArgumentException(s"User already has an account of type ${account.name}")
+    else
+      copy(accounts = accounts + account)
 
-  def openAccount(account: Account): Customer = {
-    accounts += account
-    this
-  }
+  def numberOfAccounts: Int =
+    accounts.size
 
-  def numberOfAccounts: Int = accounts.size
+  def totalInterestEarned: Double =
+    accounts.map(_.interestEarned).sum
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
-
-  /**
-   * This method gets a statement
-   */
   def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 start
-    var statement: String = null //reset statement to null here
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 end
     val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
-    statement = f"Statement for $name\n" +
-      accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
-      s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
-    statement
+    val totalsText = toDollars(totalAcrossAllAccounts)
+    val statementsForEachAccount = accounts.map(statementForAccount).mkString("\n", "\n\n", "\n")
+    s"Statement for $name\n$statementsForEachAccount\nTotal In All Accounts $totalsText"
   }
 
-  private def statementForAccount(a: Account): String = {
-    val accountType = a.accountType match {
-      case Account.CHECKING =>
+  private def statementForAccount(account: Account): String = {
+    val accountType = account match {
+      case Checking() =>
         "Checking Account\n"
-      case Account.SAVINGS =>
+      case Savings() =>
         "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
+      case MaxiSavings() =>
         "Maxi Savings Account\n"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
-      .mkString("  ", "\n  ", "\n")
-    val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
-    accountType + transactionSummary + totalSummary
+    val formatter = (t: Transaction) => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs)
+    val transactionSummary = account.transactionSummary(formatter)
+    val totalDollars = toDollars(account.sumTransactions())
+    val totalSummary = s"Total ${totalDollars}"
+    s"$accountType$transactionSummary$totalSummary"
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
-    t.amount match {
-      case a if a < 0 => "withdrawal"
-      case a if a > 0 => "deposit"
-      case _ => "N/A"
-    }
+  private def withdrawalOrDepositText(t: Transaction): String =
+    if (t.amount < 0)
+      "withdrawal"
+    else if (t.amount > 0)
+      "deposit"
+    else
+      "N/A" // this is a bit worrying since you've got a bigger problem!
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 }

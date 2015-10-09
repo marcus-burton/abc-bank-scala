@@ -1,6 +1,5 @@
 package com.abc
+import java.time.Instant // 
 
-case class Transaction(var amount: Double) {
-  val transactionDate = DateProvider.getInstance.now
-}
+case class Transaction(amount: Double, transactionDate: Instant = DateProvider.now)
 

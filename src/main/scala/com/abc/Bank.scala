@@ -1,42 +1,36 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
+import java.util.{ArrayList, Collections => JavaCollections}
 
 class Bank {
-  var customers = new ListBuffer[Customer]
+  val customers = JavaCollections.synchronizedList(new ArrayList[Customer])
 
-  def addCustomer(customer: Customer) {
-    customers += customer
-  }
+  def addCustomer(customer: Customer): Unit =
+    customers.add(customer)
 
-  def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+  def customerSummary: String = customers.synchronized {
+    val customerAccountsText = customers.asScala.map { customer =>
+      val accountsText =  format(customer.numberOfAccounts, "account")
+      s"\n - ${customer.name} ($accountsText)"
+    }.mkString
+    s"Customer Summary$customerAccountsText"
   }
 
   private def format(number: Int, word: String): String = {
-    number + " " + (if (number == 1) word else word + "s")
+    val plural = if (number == 1) "" else "s"
+    s"$number $word$plural"
   }
 
-  def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+  def totalInterestPaid: Double = customers.synchronized {
+    customers.asScala.foldLeft(0.0){ (interestPaid, customer) => 
+      interestPaid + customer.totalInterestEarned
+    }
   }
 
-  def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
-    }
+  // ok I changed it a bit since I like functions that work on empty lists
+  def getFirstCustomer: Option[String] = customers.synchronized {
+    customers.asScala.headOption.map(_.name)
   }
 
 }
