@@ -8,14 +8,14 @@ case object CHECKING extends AccountType("checking")
 case object SAVINGS extends AccountType("savings")
 case object MAXI_SAVINGS extends AccountType("maxi_savings")
 
-class Account(val accountType: AccountType) {
+case class Account(accountType: AccountType) {
 
   // By way of discussion real data would be stored somewhere on disk/not just in memory
   // When keeping a representation in memory the nice scala-ish thing to do is use immutable data structures
   // When data needs to be updated your options include using java synchronization methods, or using akka...
   // Using some kind of explicit synchronization is the smallest departure from whats here already.
   // Disclaimer: I haven't used scala conversions/syntactic sugar on of java synchronization wrappers before this.
-  val transactions = JavaCollections.synchronizedList(new ArrayList[Transaction]())
+  private val transactions = JavaCollections.synchronizedList(new ArrayList[Transaction]())
 
   def deposit(amount: Double): Either[String, Boolean] =
     if (amount <= 0)

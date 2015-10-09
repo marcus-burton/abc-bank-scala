@@ -22,24 +22,24 @@ class BankTest extends FlatSpec with Matchers {
 
   it should "savings account" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val checkingAccount: Account = Account(SAVINGS)
+    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(1500.0)
     bank.totalInterestPaid should be(2.0)
   }
 
   it should "maxi savings account" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(MAXI_SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val checkingAccount: Account = Account(MAXI_SAVINGS)
+    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(3000.0)
     bank.totalInterestPaid should be(170.0)
   }
 
   it should "reject negative deposit" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(MAXI_SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val checkingAccount: Account = Account(MAXI_SAVINGS)
+    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
     val failMessage = checkingAccount.deposit(-100.0) match {
       case Left(msg) => msg
       case Right(_) => "NOPE"
@@ -49,8 +49,8 @@ class BankTest extends FlatSpec with Matchers {
 
   it should "reject negative withdrawal" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(MAXI_SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val checkingAccount: Account = Account(MAXI_SAVINGS)
+    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
     val failMessage = checkingAccount.withdraw(-100.0) match {
       case Left(msg) => msg
       case Right(_) => "NOPE"
