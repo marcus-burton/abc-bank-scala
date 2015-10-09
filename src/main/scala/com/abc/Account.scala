@@ -67,7 +67,9 @@ case class MaxiSavings() extends Account {
 
   def interestEarned: Double = {
     val amount = sumTransactions()
-    if (amount <= 1000)
+    if (amount < 0)
+      0
+    else if (amount <= 1000)
       amount * 0.02
     else if (amount <= 2000)
       20 + (amount - 1000) * 0.05

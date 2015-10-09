@@ -6,12 +6,19 @@ class BankTest extends FlatSpec with Matchers {
 
   "Bank" should "customer summary" in {
     val bank: Bank = new Bank
-    var john: Customer = Customer("John").openAccount(Checking())
+    val john: Customer = Customer("John").openAccount(Checking())
     bank.addCustomer(john)
     bank.customerSummary should be("Customer Summary\n - John (1 account)")
   }
 
-  it should "checking account" in {
+  it should "not allow multiple accounts of same type" in {
+    val john: Customer = Customer("John")
+    intercept[IllegalArgumentException] {
+      john.openAccount(Checking()).openAccount(Checking())
+    }
+  }
+
+  it should "checking account interest" in {
     val bank: Bank = new Bank
     val checkingAccount: Account = Checking()
     val bill: Customer = Customer("Bill").openAccount(checkingAccount)
@@ -20,27 +27,27 @@ class BankTest extends FlatSpec with Matchers {
     bank.totalInterestPaid should be(0.1)
   }
 
-  it should "savings account" in {
+  it should "savings account interest" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = Savings()
-    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(1500.0)
+    val savingsAccount: Account = Savings()
+    bank.addCustomer(Customer("Bill").openAccount(savingsAccount))
+    savingsAccount.deposit(1500.0)
     bank.totalInterestPaid should be(2.0)
   }
 
   it should "maxi savings account" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = MaxiSavings()
-    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(3000.0)
+    val maxiAccount: Account = MaxiSavings()
+    bank.addCustomer(Customer("Bill").openAccount(maxiAccount))
+    maxiAccount.deposit(3000.0)
     bank.totalInterestPaid should be(170.0)
   }
 
   it should "reject negative deposit" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = MaxiSavings()
-    bank.addCustomer(Customer("Bill").openAccount(checkingAccount))
-    val failMessage = checkingAccount.deposit(-100.0) match {
+    val account: Account = MaxiSavings()
+    bank.addCustomer(Customer("Bill").openAccount(account))
+    val failMessage = account.deposit(-100.0) match {
       case Left(msg) => msg
       case Right(_) => "NOPE"
     }
