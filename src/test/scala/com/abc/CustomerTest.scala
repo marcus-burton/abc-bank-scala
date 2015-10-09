@@ -4,8 +4,8 @@ import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
   "Customer" should "statement" in {
-    val checkingAccount: Account = Account(CHECKING)
-    val savingsAccount: Account = Account(SAVINGS)
+    val checkingAccount: Account = Checking()
+    val savingsAccount: Account = Savings()
     val henry: Customer = Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
     checkingAccount.deposit(100.0)
     savingsAccount.deposit(4000.0)
@@ -17,20 +17,20 @@ class CustomerTest extends FlatSpec with Matchers {
   }
 
   it should "testOneAccount" in {
-    val oscar: Customer = Customer("Oscar").openAccount(Account(SAVINGS))
+    val oscar: Customer = Customer("Oscar").openAccount(Savings())
     oscar.numberOfAccounts should be(1)
   }
 
   it should "testTwoAccount" in {
-    val oscar: Customer = Customer("Oscar").openAccount(Account(SAVINGS)).openAccount(Account(CHECKING))
+    val oscar: Customer = Customer("Oscar").openAccount(Savings()).openAccount(Checking())
     oscar.numberOfAccounts should be(2)
   }
 
   it should "testThreeAcounts" in {
     val oscar: Customer = 
-      new Customer("Oscar").openAccount(Account(SAVINGS))
-        .openAccount(Account(CHECKING))
-        .openAccount(Account(MAXI_SAVINGS))
+      new Customer("Oscar").openAccount(Savings())
+        .openAccount(Checking())
+        .openAccount(MaxiSavings())
     oscar.numberOfAccounts should be(3)
   }
 }

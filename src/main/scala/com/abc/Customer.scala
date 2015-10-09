@@ -1,34 +1,34 @@
 package com.abc
 
 // could make accounts a concurrent Hashmap, immutable data structures are nice though  :)
-case class Customer(name: String, accounts: Map[AccountType, Account] = Map.empty[AccountType, Account]) {
+case class Customer(name: String, accounts: Set[Account] = Set.empty[Account]) {
 
   def openAccount(account: Account): Customer =
-    if (accounts.contains(account.accountType))
-      throw new IllegalArgumentException(s"User already has an account of type ${account.accountType.name}")
+    if (accounts.contains(account))
+      throw new IllegalArgumentException(s"User already has an account of type ${account.name}")
     else
-      copy(accounts = accounts + (account.accountType -> account))
+      copy(accounts = accounts + account)
 
   def numberOfAccounts: Int =
     accounts.size
 
   def totalInterestEarned: Double =
-    accounts.values.map(_.interestEarned).sum
+    accounts.map(_.interestEarned).sum
 
   def getStatement: String = {
-    val totalAcrossAllAccounts = accounts.values.map(_.sumTransactions()).sum
+    val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
     val totalsText = toDollars(totalAcrossAllAccounts)
-    val statementsForEachAccount = accounts.values.map(statementForAccount).mkString("\n", "\n\n", "\n")
+    val statementsForEachAccount = accounts.map(statementForAccount).mkString("\n", "\n\n", "\n")
     s"Statement for $name\n$statementsForEachAccount\nTotal In All Accounts $totalsText"
   }
 
   private def statementForAccount(account: Account): String = {
-    val accountType = account.accountType match {
-      case CHECKING =>
+    val accountType = account match {
+      case Checking() =>
         "Checking Account\n"
-      case SAVINGS =>
+      case Savings() =>
         "Savings Account\n"
-      case MAXI_SAVINGS =>
+      case MaxiSavings() =>
         "Maxi Savings Account\n"
     }
     val formatter = (t: Transaction) => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs)
