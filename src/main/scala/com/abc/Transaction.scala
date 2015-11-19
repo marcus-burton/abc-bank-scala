@@ -1,6 +1,7 @@
 package com.abc
 
-case class Transaction(var amount: Double) {
-  val transactionDate = DateProvider.getInstance.now
-}
+import java.util.Calendar
 
+case class Transaction(method: String, var amount: Double) {
+  val transactionDate = Calendar.getInstance()
+}

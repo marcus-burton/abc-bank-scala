@@ -10,10 +10,7 @@ class Bank {
   }
 
   def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+    "Customer Summary" + customers.map(customer => "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")").mkString
   }
 
   private def format(number: Int, word: String): String = {
@@ -21,15 +18,13 @@ class Bank {
   }
 
   def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+    customers.map(_.totalInterestEarned).sum
   }
 
   def getFirstCustomer: String = {
     try {
       customers = null
-      customers(0).name
+      customers.head.name
     }
     catch {
       case e: Exception => {
