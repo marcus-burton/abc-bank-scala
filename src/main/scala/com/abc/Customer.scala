@@ -29,25 +29,17 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   private def statementForAccount(a: Account): String = {
     val accountType = a.accountType match {
-      case Account.CHECKING =>
-        "Checking Account\n"
-      case Account.SAVINGS =>
-        "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
-        "Maxi Savings Account\n"
+      case Account.CHECKING => "Checking Account\n"
+      case Account.SAVINGS => "Savings Account\n"
+      case Account.MAXI_SAVINGS => "Maxi Savings Account\n"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
+    val transactionSummary = a.transactions.map(t => transactionMethod(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
     val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
     accountType + transactionSummary + totalSummary
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
-    t.amount match {
-      case a if a < 0 => "withdrawal"
-      case a if a > 0 => "deposit"
-      case _ => "N/A"
-    }
+  private def transactionMethod(t: Transaction) = t.method
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 }
