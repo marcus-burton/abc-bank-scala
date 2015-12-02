@@ -1,6 +1,8 @@
 package com.abc
 
 import org.scalatest.{Matchers, FlatSpec}
+import java.util.Date
+import java.util.Calendar
 
 class BankTest extends FlatSpec with Matchers {
 
@@ -37,24 +39,44 @@ class BankTest extends FlatSpec with Matchers {
 
   it should "savings account" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new SavingsAccount()
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(1500.0)
+    val savingsAccount: Account = new SavingsAccount()
+    bank.addCustomer(new Customer("Bill").openAccount(savingsAccount))
+    savingsAccount.deposit(1500.0)
     bank.totalInterestPaid should be(2.0)
-    checkingAccount.withdraw(700)
+    savingsAccount.withdraw(700)
     bank.totalInterestPaid should be(0.8)
   }
 
   it should "maxi savings account" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new MaxiSavingsAccount()
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val maxiSavingsAccount: Account = new MaxiSavingsAccount()
+    bank.addCustomer(new Customer("Bill").openAccount(maxiSavingsAccount))
+    /**
     checkingAccount.deposit(3000.0)
     bank.totalInterestPaid should be(170.0)
     checkingAccount.withdraw(1200.0)
     bank.totalInterestPaid should be(60.0)
     checkingAccount.withdraw(1200.0)
     bank.totalInterestPaid should be(12.0)
+      */
+    val now:Date  = DateProvider.now
+    maxiSavingsAccount.addTransaction(new FakeTransaction(1000, now))
+    bank.totalInterestPaid should be(50)
+
+    val cal = Calendar.getInstance()
+    cal.setTime(now)
+    cal.add(Calendar.DATE, -11)
+    val elevenDaysAgo = cal.getTime
+
+    maxiSavingsAccount.addTransaction(new FakeTransaction(-200, elevenDaysAgo))
+    bank.totalInterestPaid should be(40)
+
+    cal.add(Calendar.DATE, 3)
+    val eightDaysAgo = cal.getTime
+
+    maxiSavingsAccount.addTransaction(new FakeTransaction(-200, eightDaysAgo))
+
+    bank.totalInterestPaid should be(0.6)
   }
 
   it should "total interest" in {
