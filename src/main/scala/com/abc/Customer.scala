@@ -28,14 +28,8 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
   }
 
   private def statementForAccount(a: Account): String = {
-    val accountType = a.accountType match {
-      case Account.CHECKING =>
-        "Checking Account\n"
-      case Account.SAVINGS =>
-        "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
-        "Maxi Savings Account\n"
-    }
+    val accountType = a.toString + "\n"
+
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
     val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
