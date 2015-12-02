@@ -2,12 +2,6 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-object Account {
-  final val CHECKING: Int = 0
-  final val SAVINGS: Int = 1
-  final val MAXI_SAVINGS: Int = 2
-}
-
 abstract class Account(val transactions: ListBuffer[Transaction] = ListBuffer()) {
 
   def deposit(amount: Double) {
@@ -25,11 +19,11 @@ abstract class Account(val transactions: ListBuffer[Transaction] = ListBuffer())
   }
 
   def interestEarned: Double = {
-    val amount: Double = sumTransactions()
+    val amount: Double = sumTransactions
     calculateInterest(amount)
   }
 
-  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
+  def sumTransactions: Double = transactions.map(_.amount).sum
 
   protected def calculateInterest(amount: Double): Double
 }

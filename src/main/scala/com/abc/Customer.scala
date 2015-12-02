@@ -20,7 +20,7 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     //JIRA-123 Change by Joe Bloggs 29/7/1988 start
     var statement: String = null //reset statement to null here
     //JIRA-123 Change by Joe Bloggs 29/7/1988 end
-    val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
+    val totalAcrossAllAccounts = accounts.map(_.sumTransactions).sum
     statement = f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
@@ -44,5 +44,16 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
+
+  def transfer(fromAccount: Account, toAccount:Account, amount: Double) = {
+    if( ! accounts.contains(fromAccount) || ! accounts.contains(toAccount) ) {
+      throw new IllegalArgumentException("cannot tranfers between accounts not owned")
+    }
+    if( amount <= 0.0 ) {
+      throw new IllegalArgumentException("transfer amount must be greater than zero")
+    }
+    fromAccount.withdraw(amount)
+    toAccount.deposit(amount)
+  }
 }
 

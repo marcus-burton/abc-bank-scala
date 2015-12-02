@@ -34,4 +34,23 @@ class CustomerTest extends FlatSpec with Matchers {
     }
   }
 
+  it should "transfer" in {
+    val checkingAccount: Account = new CheckingAccount()
+    checkingAccount.deposit(1000.0)
+    val savingsAccount: Account = new SavingsAccount()
+    savingsAccount.deposit(200.0)
+    val henry: Customer = new Customer("Henry")
+
+    a [IllegalArgumentException] should be thrownBy {
+      henry.transfer(checkingAccount, savingsAccount, 500.0)
+    }
+
+    henry.openAccount(checkingAccount)
+    henry.openAccount(savingsAccount)
+    henry.transfer(checkingAccount, savingsAccount, 500.0)
+
+    checkingAccount.sumTransactions should be(500.0)
+    savingsAccount.sumTransactions should be (700.0)
+  }
+
 }
