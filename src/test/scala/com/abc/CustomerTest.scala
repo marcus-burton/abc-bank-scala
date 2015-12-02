@@ -19,17 +19,19 @@ class CustomerTest extends FlatSpec with Matchers {
   it should "testOneAccount" in {
     val oscar: Customer = new Customer("Oscar").openAccount(new SavingsAccount())
     oscar.numberOfAccounts should be(1)
-  }
 
-  it should "testTwoAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new SavingsAccount())
     oscar.openAccount(new CheckingAccount())
     oscar.numberOfAccounts should be(2)
   }
-
-  ignore should "testThreeAcounts" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new SavingsAccount())
-    oscar.openAccount(new CheckingAccount())
-    oscar.numberOfAccounts should be(3)
+  
+  it should "throw IllegalArgumentException for negative withdrawal/deposit" in {
+    val checkingAccount: Account = new CheckingAccount()
+    a [IllegalArgumentException] should be thrownBy {
+      checkingAccount.withdraw(-1000)
+    }
+    a [IllegalArgumentException] should be thrownBy {
+      checkingAccount.deposit(-1000)
+    }
   }
+
 }
