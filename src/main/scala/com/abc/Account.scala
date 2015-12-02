@@ -31,7 +31,7 @@ abstract class Account(val transactions: ListBuffer[Transaction] = ListBuffer())
 
   def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
 
-  def calculateInterest(amount: Double): Double
+  protected def calculateInterest(amount: Double): Double
 }
 
 case class CheckingAccount(override val transactions: ListBuffer[Transaction] = ListBuffer()) extends Account(transactions) {

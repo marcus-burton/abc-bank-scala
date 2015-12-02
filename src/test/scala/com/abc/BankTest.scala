@@ -57,4 +57,15 @@ class BankTest extends FlatSpec with Matchers {
     bank.totalInterestPaid should be(12.0)
   }
 
+  it should "total interest" in {
+    val bank: Bank = new Bank
+    val checkingAccount: Account = new CheckingAccount()
+    val bill: Customer = new Customer("Bill").openAccount(checkingAccount)
+    bank.addCustomer(bill)
+    checkingAccount.deposit(100.0)
+    val savingsAccount: Account = new SavingsAccount()
+    bank.addCustomer(new Customer("Carol").openAccount(savingsAccount))
+    savingsAccount.deposit(1500.0)
+    bank.totalInterestPaid should be(2.1)
+  }
 }

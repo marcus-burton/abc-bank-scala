@@ -23,7 +23,7 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.openAccount(new CheckingAccount())
     oscar.numberOfAccounts should be(2)
   }
-  
+
   it should "throw IllegalArgumentException for negative withdrawal/deposit" in {
     val checkingAccount: Account = new CheckingAccount()
     a [IllegalArgumentException] should be thrownBy {
