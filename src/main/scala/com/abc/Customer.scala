@@ -50,5 +50,6 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
+
 }
 
