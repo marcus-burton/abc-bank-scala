@@ -72,4 +72,27 @@ class CustomerTest extends FlatSpec with Matchers {
     }
   }
 
+  it should "not deadlock" in {
+    val acc1: Account = new Account(Account.CHECKING)
+    val acc2: Account = new Account(Account.SAVINGS)
+    val henry: Customer = new Customer("Henry").openAccount(acc1).openAccount(acc2)
+
+    acc1.deposit(1000000)
+    acc2.deposit(1000000)
+
+    val t1 = thread { for (i <- 0 until 1000) henry.transferFunds(acc1, acc2, 500)}
+    val t2 = thread { for (i <- 0 until 1000) henry.transferFunds(acc2, acc1, 500)}
+    t1.join(); t2.join();
+
+    acc1.sumTransactions should be eq(acc2.sumTransactions)
+  }
+
+
+  def thread(body: =>Unit): Thread = {
+    val t = new Thread {
+      override def run() = body
+    }
+    t.start()
+    t
+  }
 }

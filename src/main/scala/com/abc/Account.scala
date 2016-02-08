@@ -14,8 +14,9 @@ object Account {
   final val MAXI_SAVINGS: Int = 2
 }
 
-case class Account(val accountType: Int, protected val transactions: ListBuffer[Transaction] = ListBuffer()) {
+case class Account(val accountType: Int, val id:String = java.util.UUID.randomUUID.toString, protected val transactions: ListBuffer[Transaction] = ListBuffer()) {
   final val BPS_10_PER_DAY: BigDecimal = 0.1 / 100 / 365
+
 
   def checkAmount(amount: BigDecimal): Boolean = {
     amount > 0 && (amount * 100).isWhole()
