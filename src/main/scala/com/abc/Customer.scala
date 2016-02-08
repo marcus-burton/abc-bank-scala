@@ -1,7 +1,5 @@
 package com.abc
 
-import java.util.UUID
-
 import scala.collection.mutable.ListBuffer
 
 class Customer(val name: String, val accounts: ListBuffer[Account] = ListBuffer()) {
@@ -21,7 +19,7 @@ class Customer(val name: String, val accounts: ListBuffer[Account] = ListBuffer(
   def getStatement: String = {
     val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
     val statement = f"Statement for $name\n" +
-      accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
+      accounts.sortWith(_.accountType < _.accountType).map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
     statement
   }
