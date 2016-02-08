@@ -1,19 +1,20 @@
 package com.abc
 
+import java.time.temporal.ChronoUnit
+import java.time.{Duration, Instant}
+
 import scala.collection.mutable.ListBuffer
 
 object Account {
   final val CHECKING: Int = 0
   final val SAVINGS: Int = 1
   final val MAXI_SAVINGS: Int = 2
-
-  final val BPS:BigDecimal = BigDecimal(0.0001)
 }
 
 case class InsufficientFundsException(msg:String) extends RuntimeException
 case class InvalidAmountException(msg:String) extends RuntimeException
 
-case class Account(val accountType: Int, private val transactions: ListBuffer[Transaction] = ListBuffer()) {
+case class Account(val accountType: Int, protected val transactions: ListBuffer[Transaction] = ListBuffer()) {
   def checkAmount(amount:BigDecimal):Boolean = {
     amount > 0 && (amount *100).isWhole()
   }
@@ -33,15 +34,17 @@ case class Account(val accountType: Int, private val transactions: ListBuffer[Tr
   def transactionAmounts:List[BigDecimal] = transactions.map(_.amount).toList
 
   def interestEarned: BigDecimal = {
+    def isWithinPastTenDays(t: Transaction):Boolean = {
+      t.transactionDate.isAfter(Instant.now().truncatedTo(ChronoUnit.DAYS).minus(Duration.ofDays(9)))
+    }
     val amount: BigDecimal = sumTransactions
     accountType match {
       case Account.SAVINGS =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
+        if (amount <= 1000) amount * 0.1 /100
+        else 1 + (amount - 1000) * 0.2 /100
       case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) return amount * 0.02
-        else if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-        else 70 + (amount - 2000) * 0.1
+        if (transactions.filter(_.amount < 0).exists(isWithinPastTenDays)) amount * 0.1 /100
+        else amount * 5 /100
       case _ =>
         amount * 0.001
     }
