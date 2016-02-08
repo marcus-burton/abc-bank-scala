@@ -11,7 +11,7 @@ class Customer(val name: String, val accounts: ListBuffer[Account] = ListBuffer(
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned: BigDecimal = accounts.map(_.interestEarned).sum
 
   /**
    * This method gets a statement
@@ -46,5 +46,5 @@ class Customer(val name: String, val accounts: ListBuffer[Account] = ListBuffer(
       case _ => "N/A"
     }
 
-  private def toDollars(number: Double): String = f"$$$number%.2f"
+  private def toDollars(number: BigDecimal): String = f"$$$number%.2f"
 }

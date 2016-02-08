@@ -19,7 +19,7 @@ class Bank {
     number + " " + (if (number == 1) word else word + "s")
   }
 
-  def totalInterestPaid: Double = {
+  def totalInterestPaid: BigDecimal = {
     customers.map(_.totalInterestEarned).sum
   }
 

@@ -10,22 +10,22 @@ object Account {
 
 class Account(val accountType: Int, val transactions: ListBuffer[Transaction] = ListBuffer()) {
 
-  def deposit(amount: Double) {
+  def deposit(amount: BigDecimal) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
       transactions += Transaction(amount)
   }
 
-  def withdraw(amount: Double) {
+  def withdraw(amount: BigDecimal) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
       transactions += Transaction(-amount)
   }
 
-  def interestEarned: Double = {
-    val amount: Double = sumTransactions()
+  def interestEarned: BigDecimal = {
+    val amount: BigDecimal = sumTransactions()
     accountType match {
       case Account.SAVINGS =>
         if (amount <= 1000) amount * 0.001
@@ -39,6 +39,6 @@ class Account(val accountType: Int, val transactions: ListBuffer[Transaction] = 
     }
   }
 
-  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
+  def sumTransactions(checkAllTransactions: Boolean = true): BigDecimal = transactions.map(_.amount).sum
 
 }
