@@ -1,5 +1,6 @@
 package com.abc
 
+import com.abc.model.Transaction
 import org.scalatest.{FlatSpec, Matchers}
 
 class TransactionTest extends FlatSpec with Matchers {
