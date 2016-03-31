@@ -1,44 +1,82 @@
 package com.abc
 
 import scala.collection.mutable.ListBuffer
+import com.typesafe.scalalogging.StrictLogging
 
-object Account {
-  final val CHECKING: Int = 0
-  final val SAVINGS: Int = 1
-  final val MAXI_SAVINGS: Int = 2
+object AccountType extends Enumeration {
+  val CHECKING = AccountTypeVal("Checking Account", 1)
+  val SAVINGS = AccountTypeVal("Savings Account", 2)
+  val MAXI_SAVINGS = AccountTypeVal("Maxi Savings Account", 3)
+  protected case class AccountTypeVal(name: String, ordinal: Int) extends super.Val()
+  implicit def convert(value: Value) = value.asInstanceOf[AccountTypeVal]
+  
 }
 
-class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = ListBuffer()) {
+/**
+ * Account is Abstract class. It implements some common actions applied to all account types.
+ *  
+ * @author feir
+ *
+ */
+abstract class Account extends StrictLogging {
+  val accountType: AccountType.Value
+  private var balance: Double = 0D
+  private var transactions: ListBuffer[Transaction] = ListBuffer();
+  
+  def deposit(amount: Double) {   
+    if (amount <= 0) {
+      val ex: BankException = BankException("amount must be greater than zero", BankExceptionType.ACCOUNT_EXCEPTION)
+      logger.error("failed to deposit", ex)
+      throw ex
+    }
+    else {
+      this.synchronized {
+        balance = balance + amount;
+        transactions += Transaction(amount, TransactionType.DEPOSIT)      
+      }
+    }
 
-  def deposit(amount: Double) {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
-    else
-      transactions += Transaction(amount)
   }
 
   def withdraw(amount: Double) {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
-    else
-      transactions += Transaction(-amount)
-  }
-
-  def interestEarned: Double = {
-    val amount: Double = sumTransactions()
-    accountType match {
-      case Account.SAVINGS =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
-      case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) return amount * 0.02
-        if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-        70 + (amount - 2000) * 0.1
-      case _ =>
-        amount * 0.001
+    if (amount <= 0) {
+      val ex: BankException = BankException("amount must be greater than zero", BankExceptionType.ACCOUNT_EXCEPTION)
+      logger.error("failed to withdraw", ex)
+      throw ex
+    }
+    else {
+     this.synchronized {  
+       if (balance < amount) {
+			   val ex: BankException =  BankException("Your balance is not enough", BankExceptionType.ACCOUNT_EXCEPTION)
+         logger.error("failed to withdraw", ex)
+			   throw ex
+       }
+		  balance = balance - amount;
+      transactions += Transaction(amount, TransactionType.WITHDRAWAL)
+     }
     }
   }
 
-  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
+  def getBalance: Double = {
+    balance;
+  }
 
+  //return immutable transactions. customer transaction history should be protected 
+  def getTransactions: List[Transaction] = {
+    transactions.toList
+  }
+
+  def interestEarned(): Double
+
+  def getAccountType(): AccountType.Value = {
+    accountType
+  }
+  
+  override def equals(o: Any) = o match {
+    case that: Account => that.accountType.name.equals(this.accountType.name)
+    case _ => false
+  }
+  
+  override def hashCode = this.accountType.name.hashCode
+  
 }
