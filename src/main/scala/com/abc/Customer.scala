@@ -7,13 +7,25 @@ class Customer(val name: String) {
   val accounts: ListBuffer[Account] = ListBuffer.empty
 
   def openAccount(account: Account): Customer = {
-    accounts += account
-    this
+    if (accounts.find(_.id == account.id).isDefined)
+      throw new IllegalArgumentException("Duplicate account id: " + account.id)
+    else {
+      accounts += account
+      this
+    }
   }
 
   def numberOfAccounts: Int = accounts.size
 
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+
+  def transferAmount(amount: Double, accId1: String, accId2: String): Unit = {
+    def err(n: String) =
+      throw new IllegalArgumentException(s"Account `$n` not found")
+    val act1 = accounts.find(_.id == accId1).getOrElse(err(accId1))
+    val act2 = accounts.find(_.id == accId2).getOrElse(err(accId2))
+    act1.transferTo(amount, act2)
+  }
 
   /**
    * This method gets a statement
@@ -27,12 +39,12 @@ class Customer(val name: String) {
 
   private def statementForAccount(a: Account): String = {
     val accountType = a match {
-      case CheckingAccount() =>
-        "Checking Account\n"
-      case SavingsAccount() =>
-        "Savings Account\n"
-      case MaxiSavingsAccount() =>
-        "Maxi Savings Account\n"
+      case CheckingAccount(name) =>
+        s"Checking Account - $name\n"
+      case SavingsAccount(name) =>
+        s"Savings Account - $name\n"
+      case MaxiSavingsAccount(name) =>
+        s"Maxi Savings Account - $name\n"
     }
     val transactionSummary =
       a.transactions
