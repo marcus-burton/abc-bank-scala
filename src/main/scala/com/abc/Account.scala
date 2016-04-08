@@ -2,14 +2,6 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-sealed trait AccountType
-
-object AccountType {
-  case object Checking extends AccountType
-  case object Savings extends AccountType
-  case object MaxiSavings extends AccountType
-}
-
 trait Account {
   val transactions: ListBuffer[Transaction] = ListBuffer()
 
