@@ -1,6 +1,6 @@
 package com.abc
 
-case class Transaction(var amount: Double) {
-  val transactionDate = DateProvider.getInstance.now
-}
+import org.joda.time.DateTime
+
+case class Transaction(val amount: Double, val transactionDate: DateTime)
 
