@@ -2,10 +2,10 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+class Customer(val name: String, val accounts: ListBuffer[Account] = ListBuffer()) {
 
   def openAccount(account: Account): Customer = {
-    accounts += account
+    accounts = accounts :+ account
     this
   }
 
@@ -28,12 +28,12 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
   }
 
   private def statementForAccount(a: Account): String = {
-    val accountType = a.accountType match {
-      case Account.CHECKING =>
+    val accountType = a match {
+      case CheckingAccount() =>
         "Checking Account\n"
-      case Account.SAVINGS =>
+      case SavingsAccount() =>
         "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
+      case MaxiSavingsAccount() =>
         "Maxi Savings Account\n"
     }
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
