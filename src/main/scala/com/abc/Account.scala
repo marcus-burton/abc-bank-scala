@@ -1,11 +1,19 @@
 package com.abc
 
 import scala.collection.mutable.ListBuffer
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, Days, Hours, LocalDate }
 
 sealed trait Account {
   val id: String
   val transactions: ListBuffer[Transaction] = ListBuffer()
+
+  /**
+   * Defines how each Account deals with interests, including how
+   * to punish them.
+   * @return A function that, when given a date range, will return the
+   *         amount with interest and how much more punishment is needed
+   */
+  protected def getWithInterest(amt: BigDecimal, punishDays: Long): Long => (BigDecimal, Long)
 
   def deposit(amount: Double): Unit =
     if (amount <= 0)
@@ -14,6 +22,7 @@ sealed trait Account {
       val now = DateTime.now
       transactions += Transaction(amount, now)
     }
+
   def withdraw(amount: Double): Unit =
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
@@ -30,36 +39,74 @@ sealed trait Account {
     other.deposit(amount)
   }
 
-  def interestEarned: Double = {
-    val amount = sumTransactions()
-    this match {
-      case CheckingAccount(_) => amount * 0.001
-      case SavingsAccount(_) =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
-      case mx: MaxiSavingsAccount =>
-        val rate =
-          if (mx.withdrewInLast10Days) 0.001
-          else 0.05
-
-        amount * rate
-    }
+  /**
+   * How much interest was earned by this account.
+   */
+  def interestEarned: BigDecimal = {
+    val today = LocalDate.now
+    val (withI, sum, _) = Accumulator.accumulate(transactions)
+      .foldLeft((BigDecimal(0), BigDecimal(0), 0l)) {
+        case ((withI, s, rePunish), (amt, days, isWithdraw)) =>
+          val punish = if (isWithdraw) 10
+                       else rePunish
+          val getIntWithPunish = getWithInterest(withI + amt, punish)
+          val (newP, morePunish) = days match {
+            case DayDiff(d) => getIntWithPunish(d)
+            case UntilNext(date) =>
+              val d = Days.daysBetween(date, today).getDays
+              getIntWithPunish(d)
+          }
+          (newP, s + amt, morePunish)
+      }
+    withI - sum
   }
 
-  def sumTransactions(): Double = transactions.map(_.amount).sum
+  def sumTransactions(): BigDecimal = transactions.foldLeft(BigDecimal(0))(_ + _.amount)
+
 
   // For tests
   private[abc] def addTransaction(t: Transaction): Unit =
     transactions += t
 }
 
-case class CheckingAccount(val id: String) extends Account
-case class SavingsAccount(val id: String) extends Account
+// Utils
+object Account {
+  def withCompoundInterest(pv: BigDecimal, numOfPeriods: Long, i: Double) = {
+    val rateAtPeriod = i / 365
+    pv * math.pow((1 + rateAtPeriod), numOfPeriods)
+  }
+
+}
+
+case class CheckingAccount(val id: String) extends Account {
+  def getWithInterest(amt: BigDecimal, punish: Long) = {
+    d => (Account.withCompoundInterest(amt, d, 0.001), 0l)
+  }
+}
+
+case class SavingsAccount(val id: String) extends Account {
+  def getWithInterest(amt: BigDecimal, punish: Long) = {
+    val noPunish = 0l
+    d => {
+      val newP =
+        if (amt <= 1000) Account.withCompoundInterest(amt, d, 0.001)
+        else Account.withCompoundInterest(1000, d, 0.001) +
+              Account.withCompoundInterest(amt - 1000, d, 0.002)
+      (newP, noPunish)
+    }
+  }
+}
+
 case class MaxiSavingsAccount(val id: String) extends Account {
-  def withdrewInLast10Days: Boolean = {
-    val tenDaysAgo = DateTime.now.minusDays(10)
-    transactions
-      .find(t => t.amount < 0 && t.transactionDate.isAfter(tenDaysAgo))
-      .isDefined
+  def getWithInterest(amt: BigDecimal, punish: Long) = {
+    d =>
+      if (d > punish) { // Punish and forgive
+        val int1 = Account.withCompoundInterest(amt, punish, 0.001)
+        (Account.withCompoundInterest(int1, d - punish, 0.05), 0l)
+      }
+      else if (d < punish) // Punish and punish the next one too
+        (Account.withCompoundInterest(amt, d, 0.001), punish - d)
+      else // You have served your sentence
+        (Account.withCompoundInterest(amt, d, 0.05), 0l)
   }
 }

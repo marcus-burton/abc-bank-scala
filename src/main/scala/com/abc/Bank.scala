@@ -19,8 +19,8 @@ class Bank {
     number + " " + (if (number == 1) word else word + "s")
   }
 
-  def totalInterestPaid: Double = {
-    customers.foldLeft(0d)((total, c) => total + c.totalInterestEarned)
+  def totalInterestPaid: BigDecimal = {
+    customers.foldLeft(BigDecimal(0))((total, c) => total + c.totalInterestEarned)
   }
 
   def getFirstCustomer: String = {

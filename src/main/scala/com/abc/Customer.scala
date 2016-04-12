@@ -17,7 +17,7 @@ class Customer(val name: String) {
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned: BigDecimal = accounts.foldLeft(BigDecimal(0))(_ + _.interestEarned)
 
   def transferAmount(amount: Double, accId1: String, accId2: String): Unit = {
     def err(n: String) =
@@ -61,6 +61,6 @@ class Customer(val name: String) {
       case _ => "N/A"
     }
 
-  private def toDollars(number: Double): String = f"$$$number%.2f"
+  private def toDollars(number: BigDecimal): String = f"$$$number%.2f"
 }
 
