@@ -15,6 +15,14 @@ case class UntilNext(from: LocalDate) extends DayCounter
 object Accumulator {
   private case class Accumulator[A](list: ListBuffer[A], nextElem: A)
 
+  /**
+   * An AmountRange is simply a triplet of a BigDecimal (the amount at some
+   * day), a DayCounter (either a flat number of days between this day and
+   * the next transaction) and whether a withdrawal happened at this day.
+   *
+   * The `A <: DayCounter` is just for allowing for more typesafety when
+   * creating these, it can be ignored for the most part.
+   */
   type AmountRange[A <: DayCounter] = (BigDecimal, A, Boolean)
 
   /**
@@ -44,7 +52,7 @@ object Accumulator {
               Accumulator(l, (amt + t.amount, d, isW || t.amount < 0))
             else {
               val tAmt = transToAmount(t)
-              val dayD = Days.daysBetween(date, tAmt._2.from).getDays
+              val dayD = Days.daysBetween(date, tAmt._2.from).getDays.toLong
               Accumulator(l += ((amt, DayDiff(dayD), isW)), tAmt)
             }
           case _ =>

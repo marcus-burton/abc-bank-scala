@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 class Bank {
   val customers = new ListBuffer[Customer]
 
-  def addCustomer(customer: Customer) {
+  def addCustomer(customer: Customer): Unit = {
     customers += customer
   }
 

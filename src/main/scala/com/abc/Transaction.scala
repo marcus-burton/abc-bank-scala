@@ -1,6 +1,5 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
-import org.joda.time.{ DateTime, LocalDate }
+import org.joda.time.{ DateTime }
 
 case class Transaction(val amount: BigDecimal, val transactionDate: DateTime)

@@ -10,9 +10,9 @@ class InterestTest extends FlatSpec with Matchers {
 
   "withCompoundInterest" should "return interest compounded over days" in {
     val rate = 0.001
-    val days = 5
+    val days = 5l
     val p = 1000d
-    val added = (0 until days).foldLeft(p) { (acc, _) =>
+    val added = (0l until days).foldLeft(p) { (acc, _) =>
       acc + acc * (rate/365)
     }
     withCompoundInterest(p, days, rate) should be(added)
@@ -20,7 +20,7 @@ class InterestTest extends FlatSpec with Matchers {
 
   it should "compound over a year to yield over `p * rate`" in {
     val rate = 0.001
-    val days = 365
+    val days = 365l
     val p = BigDecimal(1000)
     withCompoundInterest(p, days, rate) should be > (p * (rate + 1))
   }
@@ -30,9 +30,9 @@ class InterestTest extends FlatSpec with Matchers {
     val rate2 = 0.002
     val dailyR1 = rate1 / 365
     val dailyR2 = rate2 / 365
-    val days = 10
+    val days = 10l
     val p = BigDecimal(20000)
-    val added = (0 until days).foldLeft(p) { (acc, _) =>
+    val added = (0l until days).foldLeft(p) { (acc, _) =>
       val interest =
         if (acc <= 1000) acc * dailyR1
         else BigDecimal(1000) * dailyR1 + (acc - 1000) * dailyR2

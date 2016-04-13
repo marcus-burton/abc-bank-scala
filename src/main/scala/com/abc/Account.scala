@@ -53,7 +53,7 @@ sealed trait Account {
           val (newP, morePunish) = days match {
             case DayDiff(d) => getIntWithPunish(d)
             case UntilNext(date) =>
-              val d = Days.daysBetween(date, today).getDays
+              val d: Long = Days.daysBetween(date, today).getDays.toLong
               getIntWithPunish(d)
           }
           (newP, s + amt, morePunish)
@@ -69,11 +69,14 @@ sealed trait Account {
     transactions += t
 }
 
-// Utils
 object Account {
-  def withCompoundInterest(pv: BigDecimal, numOfPeriods: Long, i: Double) = {
+  /**
+   * Given a principal amount, a number of days and a yearly rate,
+   * compute the compound interest with the principal amount.
+   */
+  def withCompoundInterest(pv: BigDecimal, numOfPeriods: Long, i: Double): BigDecimal = {
     val rateAtPeriod = i / 365
-    pv * math.pow((1 + rateAtPeriod), numOfPeriods)
+    pv * math.pow((1 + rateAtPeriod), numOfPeriods.toDouble)
   }
 
 }

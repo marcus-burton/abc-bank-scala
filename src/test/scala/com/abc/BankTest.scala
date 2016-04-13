@@ -17,7 +17,7 @@ class BankTest extends FlatSpec with Matchers {
    * days between transactions and the last is the expected rate for that
    * period.
    */
-  def testCompound(changes: (BigDecimal, Int, Double)*) = {
+  def testCompound(changes: (BigDecimal, Long, Double)*) = {
     val (wI, wo) = changes.foldLeft(BigDecimal(0), BigDecimal(0)) {
       case ((acc, sum), (a, d, r)) =>
         (withCompoundInterest(acc + a, d, r), sum + a)
