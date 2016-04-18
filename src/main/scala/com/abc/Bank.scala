@@ -21,21 +21,24 @@ class Bank {
   }
 
   def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+    val total: Double = customers.map(_.totalInterestEarned).sum
+    /*for {
+      c <- customers
+    } yield c.totalInterestEarned*/
+    total
   }
 
   def getFirstCustomer: String = {
     try {
-      customers = null
-      customers(0).name
+      if (customers.nonEmpty)
+        customers.head.name
+      else
+        "None"
     }
     catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
+      case e: Exception =>
+        e.printStackTrace()
+        "Error"
     }
   }
 
