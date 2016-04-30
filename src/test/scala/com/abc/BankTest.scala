@@ -21,7 +21,7 @@ class BankTest extends FlatSpec with Matchers {
   }
 
   it should "savings account" in {
-    val bank: Bank = new Bank
+    val bank: Bank = new Bank new
     val checkingAccount: Account = new Account(Account.SAVINGS)
     bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(1500.0)

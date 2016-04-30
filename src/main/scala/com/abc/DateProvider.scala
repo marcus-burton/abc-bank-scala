@@ -4,17 +4,8 @@ import java.util.Calendar
 import java.util.Date
 
 object DateProvider {
-  def getInstance: DateProvider = {
-    if (instance == null) instance = new DateProvider
-    instance
-  }
-
-  private var instance: DateProvider = null
+  def now = Calendar.getInstance.getTime
+  def getDays(numDays: Int) = Calendar.getInstance.add(Calendar.DAY_OF_MONTH, 1 * numDays).getTime
 }
 
-class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
-  }
-}
 
