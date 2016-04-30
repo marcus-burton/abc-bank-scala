@@ -1,18 +1,16 @@
-package com.abc
+package abc
 
-import scala.collection.mutable.ListBuffer
-
-class Bank {
-  var customers = new ListBuffer[Customer]
+object Bank {
+  var customers = Seq.empty[Customer]
 
   def addCustomer(customer: Customer) {
-    customers += customer
+    customers +: customer
   }
 
   def customerSummary: String = {
     var summary: String = "Customer Summary"
     for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
+      summary = summary + "\n - " + customer.printSummary()
     summary
   }
 
@@ -27,18 +25,8 @@ class Bank {
   }
 
   def getFirstCustomer: String = {
-    try {
-      customers = null
+    if(!customers.isEmpty)
       customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
-    }
   }
 
 }
-
-
