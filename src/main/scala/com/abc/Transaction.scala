@@ -1,6 +1,5 @@
 package com.abc
 
-case class Transaction(var amount: Double) {
-  val transactionDate = DateProvider.getInstance.now
-}
+import Account._
 
+case class Transaction(account: Account, amount: Double, time: Int)
