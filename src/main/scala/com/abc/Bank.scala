@@ -16,8 +16,8 @@ case class Bank(name: String, transactions: List[Transaction] = List()) {
    def addAccount(acc: Account, time: Int): Bank = {
       this.copy(transactions = transactions :+ Transaction(acc,0,time))
    }
-  
-  def customerReport(acc: Account, ctime: Int) : String = {
+
+  def customerReport(ctime: Int) : String = {
     var out = ""
     val rep = transactions.groupBy(_.account.owner).map {
       case (key, value) =>
@@ -32,7 +32,7 @@ case class Bank(name: String, transactions: List[Transaction] = List()) {
             if (l1.amount < 0) j = 0
             if (i1.hasNext) l1 = i1.next()
           }
-          total += interest(acc,total,j)
+          total += interest(l1.account,total,j)
           i += 1
           j += 1
         }
