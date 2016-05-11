@@ -23,7 +23,7 @@ class BankTest extends FlatSpec with Matchers {
       checkingAccount.transactions += t1
       checkingAccount.transactions += t2
       //checkingAccount.deposit(3000.0)
-      bank.totalInterestPaid should be(0.15)
+      bank.totalInterestPaid should be(0.68)
     }
 
     it should "savings account with daily interest" in {
@@ -37,10 +37,10 @@ class BankTest extends FlatSpec with Matchers {
       checkingAccount.transactions += t1
       checkingAccount.transactions += t2
       //checkingAccount.deposit(3000.0)
-      bank.totalInterestPaid should be(0.13)
+      bank.totalInterestPaid should be(0.61)
     }
 
-    it should "maxi savings account with daily interest" in {
+    it should "maxi savings account with daily interest AND withdrawal in the last 10 days" in {
       val bank: Bank = new Bank
       val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
       bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
@@ -50,12 +50,12 @@ class BankTest extends FlatSpec with Matchers {
             //val t2 = new Transaction(200.0, testDay2, "deposit")
             //checkingAccount.transactions += t2
             checkingAccount.transactions += t1
-      checkingAccount.withdraw(100.0)
+            checkingAccount.withdraw(100.0)
       //checkingAccount.deposit(3000.0)
-      bank.totalInterestPaid should be(21.17)
+      bank.totalInterestPaid should be(0.0)
     }
 
-   it should "maxi savings account with daily interest AND withdrawal in past 10 days" in {
+   it should "maxi savings account with daily interest" in {
      val bank: Bank = new Bank
      val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
      bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
@@ -66,7 +66,7 @@ class BankTest extends FlatSpec with Matchers {
      checkingAccount.transactions += t1
      checkingAccount.transactions += t2
      //checkingAccount.deposit(3000.0)
-     bank.totalInterestPaid should be(49.89)
+     bank.totalInterestPaid should be(229.5)
    }
 
     it should "return first customer; testOne" in {

@@ -31,7 +31,7 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
     //daily interest rate calculator
   }
 
-  def daysSinceAccountOpened = Days.daysBetween(transactions.head.time, transactions.last.time).getDays //get account's age in days
+  def daysSinceAccountOpened = Days.daysBetween(transactions.last.time, DateTime.now()).getDays //get account's age in days
 
   def interestEarned: Double = {
     val amount: Double = sumTransactions()
