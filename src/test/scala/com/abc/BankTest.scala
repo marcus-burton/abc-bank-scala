@@ -15,35 +15,58 @@ class BankTest extends FlatSpec with Matchers {
     it should "checking account with real days" in {
       val bank: Bank = new Bank
       val checkingAccount: Account = new Account(Account.CHECKING)
-      val bill: Customer = new Customer("Bill").openAccount(checkingAccount)
-      bank.addCustomer(bill)
-      checkingAccount.deposit(100.0)
-      bank.totalInterestPaid should be(0.0) //deposit occured today, so total daily interest should be 0.0.
+      bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+      val testDay1 = (new DateTime).withYear(2015).withMonthOfYear(11).withDayOfMonth(25) //create a fake transaction date, otherwise it's always 0.
+      val testDay2 = (new DateTime).withYear(2015).withMonthOfYear(12).withDayOfMonth(25)
+      val t1 = new Transaction(900.0, testDay1, "deposit")
+      val t2 = new Transaction(900.0, testDay2, "deposit")
+      checkingAccount.transactions += t1
+      checkingAccount.transactions += t2
+      //checkingAccount.deposit(3000.0)
+      bank.totalInterestPaid should be(0.15)
     }
 
-    it should "savings account with daily interest" in {   //test values are used for days, since all transactions occur today.
+    it should "savings account with daily interest" in {
       val bank: Bank = new Bank
       val checkingAccount: Account = new Account(Account.SAVINGS)
       bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-      checkingAccount.deposit(1500.0)
-      bank.totalInterestPaid should be(0.03)
+      val testDay1 = (new DateTime).withYear(2015).withMonthOfYear(11).withDayOfMonth(25)
+      val testDay2 = (new DateTime).withYear(2015).withMonthOfYear(12).withDayOfMonth(25)
+      val t1 = new Transaction(900.0, testDay1, "deposit")
+      val t2 = new Transaction(900.0, testDay2, "deposit")
+      checkingAccount.transactions += t1
+      checkingAccount.transactions += t2
+      //checkingAccount.deposit(3000.0)
+      bank.totalInterestPaid should be(0.13)
     }
 
     it should "maxi savings account with daily interest" in {
       val bank: Bank = new Bank
       val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
       bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-      checkingAccount.deposit(3000.0)
-      bank.totalInterestPaid should be(3.22)
+            val testDay1 = (new DateTime).withYear(2015).withMonthOfYear(11).withDayOfMonth(25)
+            val testDay2 = (new DateTime).withYear(2015).withMonthOfYear(12).withDayOfMonth(25)
+            val t1 = new Transaction(2000.0, testDay1, "deposit")
+            //val t2 = new Transaction(200.0, testDay2, "deposit")
+            //checkingAccount.transactions += t2
+            checkingAccount.transactions += t1
+      checkingAccount.withdraw(100.0)
+      //checkingAccount.deposit(3000.0)
+      bank.totalInterestPaid should be(21.17)
     }
 
    it should "maxi savings account with daily interest AND withdrawal in past 10 days" in {
-    val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(4000.0)
-    checkingAccount.withdraw(1000.0)
-    bank.totalInterestPaid should be(3.22)
+     val bank: Bank = new Bank
+     val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
+     bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+     val testDay1 = (new DateTime).withYear(2015).withMonthOfYear(11).withDayOfMonth(25) //create a fake transaction date, otherwise it's always 0.
+     val testDay2 = (new DateTime).withYear(2015).withMonthOfYear(12).withDayOfMonth(25)
+     val t1 = new Transaction(4000.0, testDay1, "deposit")
+     val t2 = new Transaction(4000.0, testDay2, "deposit")
+     checkingAccount.transactions += t1
+     checkingAccount.transactions += t2
+     //checkingAccount.deposit(3000.0)
+     bank.totalInterestPaid should be(49.89)
    }
 
     it should "return first customer; testOne" in {

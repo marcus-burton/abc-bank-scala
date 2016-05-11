@@ -32,19 +32,17 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
   }
 
   def daysSinceAccountOpened = Days.daysBetween(transactions.head.time, transactions.last.time).getDays //get account's age in days
-  def test_days1 = 5 //testing purposes
-  def test_days2 = 11 //for testing purposes
 
   def interestEarned: Double = {
     val amount: Double = sumTransactions()
     accountType match {
       case Account.SAVINGS =>
-        if (amount <= 1000) interestRate(amount, 0.001, test_days2)
-        else interestRate(1 + (amount - 1000), 0.002, test_days2)
+        if (amount <= 1000) interestRate(amount, 0.001, daysSinceAccountOpened)
+        else interestRate(1 + (amount - 1000), 0.002, daysSinceAccountOpened)
       case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) interestRate(amount, 0.02, test_days1)
-        if (amount <= 2000)  interestRate(20 + (amount - 1000), tenDayWithdrawals, test_days1)
-        interestRate(70 + (amount - 2000), 0.1, test_days2)
+        if (amount <= 1000) interestRate(amount, 0.02, daysSinceAccountOpened)
+        if (amount <= 2000 && amount > 1000)  interestRate(20 + (amount - 1000), tenDayWithdrawals, daysSinceAccountOpened)
+        else interestRate(70 + (amount - 2000), 0.1, daysSinceAccountOpened)
       case _ =>
         interestRate(amount, 0.001, daysSinceAccountOpened)
     }

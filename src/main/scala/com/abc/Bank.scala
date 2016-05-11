@@ -20,7 +20,7 @@ class Bank {
   }
 
   def totalInterestPaid: Double = {
-    val total: Double = customers.map(_.totalInterestEarned).reduceLeft(_+_)
+    val total: Double = customers.map(_.totalInterestEarned).sum
     total
   }
 
