@@ -31,8 +31,8 @@ class BankTest extends FlatSpec with Matchers {
       .deposit(account3, 1000, 15)
       .deposit(account3, 2000, 18)
       .deposit(account3, 5000, 20)
-      .customerReport(40) should be("Jim, Checking=13374.619823778577,Savings=0.0, MaxSavings=0.0" +
-      "Jack, Checking=0.0,Savings=0.0, MaxSavings=53225.53464168409" +
-      "John, Checking=204.0382289721085,Savings=13816.513448016625, MaxSavings=0.0")
+      .customerReport(40) should be("Jim, Checking=8273.66409947586,Savings=0.0, MaxSavings=0.0" +
+      "Jack, Checking=0.0,Savings=0.0, MaxSavings=54057.77422840032" +
+      "John, Checking=204.0382289721085,Savings=8205.914081501567, MaxSavings=0.0")
   }
 }

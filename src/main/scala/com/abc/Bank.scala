@@ -9,7 +9,7 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
   val maxi:Int = 2
 
   def doTransfer(accFrom: Account, accTo: Account, amount: Double, time: Int): Bank =
-    this.copy(transactions = transactions :+ Transaction(accFrom,amount,time) :+ Transaction(accTo,amount,time+1))
+    this.copy(transactions = transactions :+ Transaction(accFrom,-amount,time) :+ Transaction(accTo,amount,time+1))
 
   def deposit(acc: Account, amount: Double, time: Int): Bank =
     this.copy(transactions = transactions :+ Transaction(acc,amount,time))
@@ -17,35 +17,28 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
   def addAccount(acc: Account, time: Int): Bank =
     this.copy(transactions = transactions :+ Transaction(acc,0,time))
 
-
   def customerReport(ctime: Int) : String = {
     var out = ""
     val rep = transactions.groupBy(_.account.owner).map {
       case (key, value) =>
+        //        println(value)
         val total = Array.fill[Double](3)(0.0)
         val i1 = value.toIterator
-        var accType, i,k,j = 0 // j - numbers of days since last withdrawal
+        var amount: Double = 0.0
+        var accType, i, j = 0 // j - numbers of days since last withdrawal
         var l1 = i1.next()
 
         while (i < ctime) {
-          if (i<value.last.time+1 && i==l1.time) {
+          if (i < value.last.time + 1 && i == l1.time) {
             accType = l1.account match {
               case _: Checking => checking
               case _: Savings => savings
               case _: MaxSavings => maxi
             }
-            total(accType) += l1.amount
-            if (l1.amount < 0) {k=j;j=0}
+            amount = l1.amount
+            total(accType) += amount
+            if (l1.amount < 0) j = 0
             if (i1.hasNext) l1 = i1.next
-            if (i == l1.time) {
-              accType = l1.account match {
-                case _: Checking => checking
-                case _: Savings => savings
-                case _: MaxSavings => maxi
-              }
-              total(accType) += l1.amount
-              j=k
-            }
           }
 
           total(checking) += interest(checking,total(checking),j)
