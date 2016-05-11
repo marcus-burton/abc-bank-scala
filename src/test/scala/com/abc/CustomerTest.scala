@@ -1,6 +1,7 @@
 package com.abc
 
 import org.scalatest.{Matchers, FlatSpec}
+import org.joda.time._
 
 class CustomerTest extends FlatSpec with Matchers {
   "Customer" should "statement" in {

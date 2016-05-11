@@ -49,11 +49,11 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       case _ => "N/A"
     }
 
-  def transferBtwnAccounts(amount: Double, withdrawAcc: Account, depositAcc: Account): String =
+  def transferBtwnAccounts(amount: Double, from: Account, to: Account): String =
   {
-      if(withdrawAcc.sumTransactions() >= amount) {
-        withdrawAcc.withdraw(amount)
-        depositAcc.deposit(amount)
+      if(from.sumTransactions() >= amount) {
+        from.withdraw(amount)
+        to.deposit(amount)
         "Transfer successful"
       }
       else

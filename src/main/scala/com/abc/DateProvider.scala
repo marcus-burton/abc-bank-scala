@@ -1,20 +1,19 @@
 package com.abc
 
-import java.util.Calendar
-import java.util.Date
+import org.joda.time._
 
 object DateProvider {
-  def getInstance: DateProvider = {
-    if (instance == null) instance = new DateProvider
-    instance
+
+  def getInstance: DateProvider =
+  {
+    if (instance.isEmpty) instance = Some(new DateProvider)
+    instance.get
   }
 
-  private var instance: DateProvider = null
+  private var instance: Option[DateProvider] = None
 }
 
 class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
-  }
+  def now = DateTime.now
 }
 
