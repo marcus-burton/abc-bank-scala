@@ -3,7 +3,7 @@ package com.abc
 import scala.collection.mutable.ListBuffer
 
 class Bank {
-  var customers = new ListBuffer[Customer]
+  val customers = new ListBuffer[Customer]
 
   def addCustomer(customer: Customer) {
     customers += customer
@@ -11,8 +11,7 @@ class Bank {
 
   def customerSummary: String = {
     var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
+    customers.foreach {c => summary = summary + "\n - " + c.name + " (" + format(c.numberOfAccounts, "account") + ")"}
     summary
   }
 
@@ -21,20 +20,19 @@ class Bank {
   }
 
   def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+    val total: Double = customers.map(_.totalInterestEarned).sum
+    total
   }
 
   def getFirstCustomer: String = {
     try {
-      customers = null
-      customers(0).name
+      if(customers.nonEmpty) customers(0).name
+      else "Empty"
     }
     catch {
       case e: Exception => {
         e.printStackTrace
-        return "Error"
+        "Error"
       }
     }
   }

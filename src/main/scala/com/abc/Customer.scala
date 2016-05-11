@@ -36,18 +36,23 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       case Account.MAXI_SAVINGS =>
         "Maxi Savings Account\n"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
+    val transactionSummary = a.transactions.map(t => t.transType + " " + toDollars(t.amount.abs)) //the transaction case class does this, no need for a new function.
       .mkString("  ", "\n  ", "\n")
     val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
     accountType + transactionSummary + totalSummary
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
-    t.amount match {
-      case a if a < 0 => "withdrawal"
-      case a if a > 0 => "deposit"
-      case _ => "N/A"
-    }
+
+  def transferBtwnAccounts(amount: Double, from: Account, to: Account): String =
+  {
+      if(from.sumTransactions() >= amount) {
+        from.withdraw(amount)
+        to.deposit(amount)
+        "Transfer successful"
+      }
+      else
+        "Insufficient funds"
+  }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 }
