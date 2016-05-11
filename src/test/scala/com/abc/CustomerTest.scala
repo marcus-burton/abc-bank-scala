@@ -32,4 +32,22 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.openAccount(new Account(Account.CHECKING))
     oscar.numberOfAccounts should be(3)
   }
+
+  it should "transfer between accounts with sufficient funds" in{
+    val withdrawalAccount: Account = new Account(Account.CHECKING)
+    val depositAccount: Account = new Account(Account.CHECKING)
+    val benjy: Customer = new Customer("Benjy").openAccount(withdrawalAccount).openAccount(depositAccount)
+    withdrawalAccount.deposit(1000.0)
+    depositAccount.deposit(217.13)
+    benjy.transferBtwnAccounts(137.10, withdrawalAccount, depositAccount) should be("Transfer successful")
+  }
+
+  it should "not transfer between accounts with insufficient funds" in{
+    val withdrawalAccount: Account = new Account(Account.CHECKING)
+    val depositAccount: Account = new Account(Account.CHECKING)
+    val benjy: Customer = new Customer("Benjy").openAccount(withdrawalAccount).openAccount(depositAccount)
+    withdrawalAccount.deposit(135.10)
+    depositAccount.deposit(217.13)
+    benjy.transferBtwnAccounts(137.10, withdrawalAccount, depositAccount) should be("Insufficient funds")
+  }
 }
