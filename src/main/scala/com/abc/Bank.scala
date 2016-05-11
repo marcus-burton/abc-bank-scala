@@ -21,10 +21,8 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
     var out = ""
     val rep = transactions.groupBy(_.account.owner).map {
       case (key, value) =>
-        //        println(value)
         val total = Array.fill[Double](3)(0.0)
         val i1 = value.toIterator
-        var amount: Double = 0.0
         var accType, i, j = 0 // j - numbers of days since last withdrawal
         var l1 = i1.next()
 
@@ -35,8 +33,7 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
               case _: Savings => savings
               case _: MaxSavings => maxi
             }
-            amount = l1.amount
-            total(accType) += amount
+            total(accType) += l1.amount
             if (l1.amount < 0) j = 0
             if (i1.hasNext) l1 = i1.next
           }
