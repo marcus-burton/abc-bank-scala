@@ -23,21 +23,30 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
-      transactions += Transaction(-amount, DateTime.now, "withdraw")
+      transactions += Transaction(-amount, DateTime.now, "withdrawal")
   }
+
+  def interestRate(principal: Double, interestRate: Double, daysPast: Double): Double = {
+    BigDecimal(principal * (interestRate/365) * daysPast).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble //round to nearest hundreth
+    //daily interest rate calculator
+  }
+
+  def daysSinceAccountOpened = Days.daysBetween(transactions.head.time, transactions.last.time).getDays //get account's age in days
+  def test_days1 = 5 //testing purposes
+  def test_days2 = 11 //for testing purposes
 
   def interestEarned: Double = {
     val amount: Double = sumTransactions()
     accountType match {
       case Account.SAVINGS =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
+        if (amount <= 1000) interestRate(amount, 0.001, test_days2)
+        else interestRate(1 + (amount - 1000), 0.002, test_days2)
       case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) amount * 0.02
-        if (amount <= 2000)  20 + (amount - 1000) * tenDayWithdrawals
-        70 + (amount - 2000) * 0.1
+        if (amount <= 1000) interestRate(amount, 0.02, test_days1)
+        if (amount <= 2000)  interestRate(20 + (amount - 1000), tenDayWithdrawals, test_days1)
+        interestRate(70 + (amount - 2000), 0.1, test_days2)
       case _ =>
-        amount * 0.001
+        interestRate(amount, 0.001, daysSinceAccountOpened)
     }
   }
 

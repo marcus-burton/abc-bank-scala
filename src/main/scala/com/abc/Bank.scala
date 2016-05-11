@@ -27,7 +27,7 @@ class Bank {
   def getFirstCustomer: String = {
     try {
       if(customers.nonEmpty) customers(0).name
-      else "None"
+      else "Empty"
     }
     catch {
       case e: Exception => {

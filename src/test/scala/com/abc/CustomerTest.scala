@@ -1,7 +1,6 @@
 package com.abc
 
 import org.scalatest.{Matchers, FlatSpec}
-import org.joda.time._
 
 class CustomerTest extends FlatSpec with Matchers {
   "Customer" should "statement" in {
@@ -28,7 +27,7 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.numberOfAccounts should be(2)
   }
 
-  ignore should "testThreeAcounts" in {
+  ignore should "testThreeAccounts" in {
     val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
     oscar.openAccount(new Account(Account.CHECKING))
     oscar.numberOfAccounts should be(3)
