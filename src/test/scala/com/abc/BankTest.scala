@@ -79,7 +79,7 @@ class BankTest extends FlatSpec with Matchers {
       3000d * 20 * 0.001 / 365 +
       500d * 15 * 0.001 / 365 +
       3000d * 10 * 0.001 / 365 +
-      -100d * 7 * 0.05 / 365 +
+      -100d * 7 * 0.001 / 365 +
       3000d * 5 * 0.001 / 365
 
     Math.abs(bank.totalInterestPaid - interest) should be < 0.000001
