@@ -9,46 +9,49 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
   val maxi:Int = 2
 
   def doTransfer(accFrom: Account, accTo: Account, amount: Double, time: Int): Bank =
-    this.copy(transactions = transactions :+ Transaction(accFrom,-amount,time) :+ Transaction(accTo,amount,time+1))
+    this.copy(transactions = transactions :+ Transaction(accFrom,-amount,time) :+ Transaction(accTo,amount,time))
 
   def deposit(acc: Account, amount: Double, time: Int): Bank =
     this.copy(transactions = transactions :+ Transaction(acc,amount,time))
-  
+
   def addAccount(acc: Account, time: Int): Bank =
     this.copy(transactions = transactions :+ Transaction(acc,0,time))
 
   def customerReport(ctime: Int) : String = {
-    var out = ""
+    var outCurrent, out = ""
     val rep = transactions.groupBy(_.account.owner).map {
-      case (key, value) =>
+      case (cName, cTransactions) =>
         val total = Array.fill[Double](3)(0.0)
-        val i1 = value.toIterator
+        val i1 = cTransactions.toIterator
+        var hasChecking, hasSavings, hasMaxiS = false
         var accType, i, j = 0 // j - numbers of days since last withdrawal
         var l1 = i1.next()
 
         while (i < ctime) {
-          if (i < value.last.time + 1 && i == l1.time) {
+          if (i == l1.time) {
             accType = l1.account match {
-              case _: Checking => checking
-              case _: Savings => savings
-              case _: MaxSavings => maxi
+              case _: Checking => hasChecking=true; checking
+              case _: Savings => hasSavings=true; savings
+              case _: MaxSavings => hasMaxiS=true; maxi
             }
             total(accType) += l1.amount
             if (l1.amount < 0) j = 0
-            if (i1.hasNext) l1 = i1.next
+            if (i1.hasNext) {l1 = i1.next; if (i==l1.time) i-=1}
           }
 
           total(checking) += interest(checking,total(checking),j)
           total(savings) += interest(savings,total(savings),j)
           total(maxi) += interest(maxi,total(maxi),j)
-          i += 1
-          j += 1
+          i += 1; j += 1
         }
-        (key,total(checking),total(savings),total(maxi))
+        (cName,hasChecking,total(checking),hasSavings,total(savings),hasMaxiS,total(maxi))
     }.foreach {
-      case (name, totalC, totalS, totalMaxS) =>
-        println(s"$name, Checking=$totalC,Savings=$totalS, MaxSavings=$totalMaxS")
-        out += s"$name, Checking=$totalC,Savings=$totalS, MaxSavings=$totalMaxS"
+      case (name,hasC,totalC,hasS,totalS,hasMaxiS,totalMaxS) =>
+        outCurrent = "\n"
+        if(hasC) outCurrent += s"$name has checking account  with current balance = $totalC\n"
+        if(hasS) outCurrent += s"$name has savings account  with current balance = $totalS\n"
+        if(hasMaxiS) outCurrent += s"$name has maxi account  with current balance = $totalMaxS\n"
+        println(outCurrent); out+=outCurrent
     }
     out
   }
