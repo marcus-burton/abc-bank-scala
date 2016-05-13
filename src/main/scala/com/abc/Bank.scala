@@ -4,53 +4,47 @@ import Account._
 
 case class Bank(name: String, var transactions: List[Transaction] = List()) {
 
-  val checking:Int = 0
-  val savings:Int = 1
-  val maxi:Int = 2
+  val checking = 0; val savings = 1; val maxi = 2
 
-  def doTransfer(accFrom: Account, accTo: Account, amount: Double, time: Int): Bank =
-    this.copy(transactions = transactions :+ Transaction(accFrom,-amount,time) :+ Transaction(accTo,amount,time))
+  def doTransfer(accountFrom: Account, accountTo: Account, amount: Double, time: Int): Bank =
+    this.copy(transactions = transactions :+ Transaction(accountFrom,-amount,time) :+ Transaction(accountTo,amount,time))
 
-  def deposit(acc: Account, amount: Double, time: Int): Bank =
-    this.copy(transactions = transactions :+ Transaction(acc,amount,time))
+  def deposit(account: Account, amount: Double, time: Int): Bank =
+    this.copy(transactions = transactions :+ Transaction(account,amount,time))
 
-  def addAccount(acc: Account, time: Int): Bank =
-    this.copy(transactions = transactions :+ Transaction(acc,0,time))
+  def addAccount(account: Account, time: Int): Bank =
+    this.copy(transactions = transactions :+ Transaction(account,0,time))
 
-  def customerReport(ctime: Int) : String = {
+  def customerReport(reportTime: Int) : String = {
     var outCurrent, out = ""
-    val rep = transactions.groupBy(_.account.owner).map {
-      case (cName, cTransactions) =>
-        val total = Array.fill[Double](3)(0.0)
-        val intOnInt = Array.fill[Double](3)(0.0)
-        val i1 = cTransactions.toIterator
+    val rep = transactions.groupBy(_.account.owner).map { case (customerName, transactions) =>
+        val total, intOnInt = Array.fill[Double](3)(0.0)
         var hasChecking, hasSavings, hasMaxiS = false
-        var accType, i, j = 0 // j - numbers of days since last withdrawal
-        var l1 = i1.next()
+        var i, daysSinceLastWithdrawal = 0
+        val transIter = transactions.toIterator
+        var currentTrans = transIter.next()
 
-        while (i < ctime) {
-          if (i == l1.time) {
-            accType = l1.account match {
+        while (i < reportTime) {
+          if (i == currentTrans.time) {
+            val accountType = currentTrans.account match {
               case _: Checking => hasChecking=true; checking
               case _: Savings => hasSavings=true; savings
               case _: MaxSavings => hasMaxiS=true; maxi
             }
-            total(accType) += l1.amount
-            if (l1.amount < 0) j = 0
-            if (i1.hasNext) {l1 = i1.next; if (i==l1.time) i-=1}
+            total(accountType) += currentTrans.amount
+            if (currentTrans.amount < 0) daysSinceLastWithdrawal = 0
+            if (transIter.hasNext) {currentTrans = transIter.next; if (i==currentTrans.time) i-=1}
           }
 
-          for (k <- List(checking, savings, maxi))
-            intOnInt(k) += interest(k,total(k)+intOnInt(k),j)
+          for (accountType <- List(checking, savings, maxi))
+            intOnInt(accountType) += interest(accountType,total(accountType)+intOnInt(accountType),daysSinceLastWithdrawal)
 
-          i += 1; j += 1
+          i += 1; daysSinceLastWithdrawal += 1
         }
-        (cName,
-          hasChecking,total(checking)+intOnInt(checking),intOnInt(checking),
-          hasSavings,total(savings)+intOnInt(savings),intOnInt(savings),
-          hasMaxiS,total(maxi)+intOnInt(maxi),intOnInt(maxi))
-    }.foreach {
-      case (name,hasC,totalC,intC,hasS,totalS,intS,hasMaxiS,totalMaxS,intM) =>
+        (customerName, hasChecking,total(checking)+intOnInt(checking),intOnInt(checking),
+                hasSavings,total(savings)+intOnInt(savings),intOnInt(savings),
+                hasMaxiS,total(maxi)+intOnInt(maxi),intOnInt(maxi))
+    }.foreach { case (name,hasC,totalC,intC,hasS,totalS,intS,hasMaxiS,totalMaxS,intM) =>
         outCurrent = "\n"
         if(hasC) outCurrent += s"$name has checking account  with current balance = $totalC, including accrued interest = $intC\n"
         if(hasS) outCurrent += s"$name has savings account  with current balance = $totalS, including accrued interest = $intS\n"
@@ -60,10 +54,10 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
     out
   }
  
- def interest(acctType: Int, amount: Double, lw: Int): Double = acctType match {
+ def interest(accountType: Int, amount: Double, daysSinceLastWithdrawal: Int): Double = accountType match {
     case `checking` => checkingInterest(amount)
     case `savings` => savingsInterest(amount)
-    case `maxi` => maxSavingsInterest(amount, lw)
+    case `maxi` => maxSavingsInterest(amount, daysSinceLastWithdrawal)
   }
   
   def checkingInterest(amount: Double) = {
@@ -79,15 +73,15 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
       savingsInterest(1000) + (amount - 1000) * 0.02/365
   }
   
-  def maxSavingsInterest(amount: Double, lw: Int): Double = {
-    val intr = if (lw > 10) 0.1/365 else 0.05/365
+  def maxSavingsInterest(amount: Double, daysSinceLastWithdrawal: Int): Double = {
+    val rate = if (daysSinceLastWithdrawal > 10) 0.1/365 else 0.05/365
     require(amount >= 0) 
     if (amount <= 1000) 
       amount * 0.02/365
     else if (amount > 1000 && amount <= 2000) 
-      maxSavingsInterest(1000, lw) + (amount - 1000) * intr
+      maxSavingsInterest(1000, daysSinceLastWithdrawal) + (amount - 1000) * rate
     else
-      maxSavingsInterest(2000, lw) + (amount - 2000) * intr
+      maxSavingsInterest(2000, daysSinceLastWithdrawal) + (amount - 2000) * rate
   }
 }
 
