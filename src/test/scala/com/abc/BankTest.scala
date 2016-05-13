@@ -31,9 +31,9 @@ class BankTest extends FlatSpec with Matchers {
       .deposit(account3, 1000, 15)
       .deposit(account3, 2000, 18)
       .deposit(account3, 5000, 20)
-      .customerReport(40) should be("\nJim has checking account  with current balance = 8273.66409947586\n" +
-      "\nJack has maxi account  with current balance = 54057.77422840032\n" +
-      "\nJohn has checking account  with current balance = 204.2422672010806\n" +
-      "John has savings account  with current balance = 8210.93899152067\n")
+      .customerReport(40) should be("\nJim has checking account  with current balance = 8104.710904795356, including accrued interest = 4.710904795356014\n" +
+      "\nJack has maxi account  with current balance = 8141.641856144109, including accrued interest = 41.64185614410875\n" +
+      "\nJohn has checking account  with current balance = 200.1151000242361, including accrued interest = 0.11510002423611919\n" +
+      "John has savings account  with current balance = 7908.355235675221, including accrued interest = 8.35523567522043\n")
   }
 }

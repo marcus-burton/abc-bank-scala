@@ -22,6 +22,7 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
     val rep = transactions.groupBy(_.account.owner).map {
       case (cName, cTransactions) =>
         val total = Array.fill[Double](3)(0.0)
+        val intOnInt = Array.fill[Double](3)(0.0)
         val i1 = cTransactions.toIterator
         var hasChecking, hasSavings, hasMaxiS = false
         var accType, i, j = 0 // j - numbers of days since last withdrawal
@@ -39,18 +40,21 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
             if (i1.hasNext) {l1 = i1.next; if (i==l1.time) i-=1}
           }
 
-          total(checking) += interest(checking,total(checking),j)
-          total(savings) += interest(savings,total(savings),j)
-          total(maxi) += interest(maxi,total(maxi),j)
+          for (k <- List(checking, savings, maxi))
+            intOnInt(k) += interest(k,total(k)+intOnInt(k),j)
+
           i += 1; j += 1
         }
-        (cName,hasChecking,total(checking),hasSavings,total(savings),hasMaxiS,total(maxi))
+        (cName,
+          hasChecking,total(checking)+intOnInt(checking),intOnInt(checking),
+          hasSavings,total(savings)+intOnInt(savings),intOnInt(savings),
+          hasMaxiS,total(maxi)+intOnInt(maxi),intOnInt(maxi))
     }.foreach {
-      case (name,hasC,totalC,hasS,totalS,hasMaxiS,totalMaxS) =>
+      case (name,hasC,totalC,intC,hasS,totalS,intS,hasMaxiS,totalMaxS,intM) =>
         outCurrent = "\n"
-        if(hasC) outCurrent += s"$name has checking account  with current balance = $totalC\n"
-        if(hasS) outCurrent += s"$name has savings account  with current balance = $totalS\n"
-        if(hasMaxiS) outCurrent += s"$name has maxi account  with current balance = $totalMaxS\n"
+        if(hasC) outCurrent += s"$name has checking account  with current balance = $totalC, including accrued interest = $intC\n"
+        if(hasS) outCurrent += s"$name has savings account  with current balance = $totalS, including accrued interest = $intS\n"
+        if(hasMaxiS) outCurrent += s"$name has maxi account  with current balance = $totalMaxS, including accrued interest = $intM\n"
         println(outCurrent); out+=outCurrent
     }
     out
@@ -64,22 +68,22 @@ case class Bank(name: String, var transactions: List[Transaction] = List()) {
   
   def checkingInterest(amount: Double) = {
     require(amount >= 0)
-    amount * 0.001
+    amount * 0.01/365
   }
   
   def savingsInterest(amount: Double): Double = {
     require(amount >= 0)
     if (amount <= 1000) 
-      amount * 0.001
+      amount * 0.01/365
     else
-      savingsInterest(1000) + (amount - 1000) * 0.002
+      savingsInterest(1000) + (amount - 1000) * 0.02/365
   }
   
   def maxSavingsInterest(amount: Double, lw: Int): Double = {
-    val intr = if (lw > 10) 0.1 else 0.05
+    val intr = if (lw > 10) 0.1/365 else 0.05/365
     require(amount >= 0) 
     if (amount <= 1000) 
-      amount * 0.02
+      amount * 0.02/365
     else if (amount > 1000 && amount <= 2000) 
       maxSavingsInterest(1000, lw) + (amount - 1000) * intr
     else
