@@ -2,9 +2,9 @@ package com.abc
 
 import Account._
 
-case class Bank(name: String, var transactions: List[Transaction] = List()) {
+case class Bank(name: String, transactions: List[Transaction] = List()) {
 
-  val checking = 0; val savings = 1; val maxi = 2
+  val (checking,savings,maxi) = (0,1,2)
 
   def doTransfer(accountFrom: Account, accountTo: Account, amount: Double, time: Int): Bank =
     this.copy(transactions = transactions :+ Transaction(accountFrom,-amount,time) :+ Transaction(accountTo,amount,time))
