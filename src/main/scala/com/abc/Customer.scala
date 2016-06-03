@@ -1,5 +1,7 @@
 package com.abc
 
+import java.time.Instant
+
 import scala.collection.mutable.ListBuffer
 
 class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
@@ -11,29 +13,27 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned(atDate: Instant = Instant.now): BigDecimal = accounts.map(_.interestEarned(atDate)).sum
 
   /**
    * This method gets a statement
    */
   def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 start
-    var statement: String = null //reset statement to null here
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 end
     val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
-    statement = f"Statement for $name\n" +
-      accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
-      s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
-    statement
+    f"""
+      |Statement for $name
+      |${accounts.map(statementForAccount).mkString("\n", "\n\n", "\n")}
+      |Total In All Accounts ${toDollars(totalAcrossAllAccounts)}
+    """.stripMargin('|').trim
   }
 
   private def statementForAccount(a: Account): String = {
     val accountType = a.accountType match {
-      case Account.CHECKING =>
+      case Account.Checking =>
         "Checking Account\n"
-      case Account.SAVINGS =>
+      case Account.Savings =>
         "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
+      case Account.MaxiSavings =>
         "Maxi Savings Account\n"
     }
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
@@ -49,6 +49,6 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       case _ => "N/A"
     }
 
-  private def toDollars(number: Double): String = f"$$$number%.2f"
+  private def toDollars(number: BigDecimal): String = f"$$$number%.2f"
 }
 

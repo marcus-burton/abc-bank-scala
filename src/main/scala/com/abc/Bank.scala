@@ -1,43 +1,32 @@
 package com.abc
 
+import java.time.Instant
+
 import scala.collection.mutable.ListBuffer
 
 class Bank {
-  var customers = new ListBuffer[Customer]
+  val customers = new ListBuffer[Customer]
 
   def addCustomer(customer: Customer) {
     customers += customer
   }
 
   def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+    val parts = customers.map { customer =>
+      s"\n - ${customer.name} (${format(customer.numberOfAccounts, "account")})"
+    }
+    "Customer Summary" + parts.mkString("")
   }
 
   private def format(number: Int, word: String): String = {
     number + " " + (if (number == 1) word else word + "s")
   }
 
-  def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+  def totalInterestPaid(atDate: Instant = Instant.now): BigDecimal = {
+    customers.map(_.totalInterestEarned(atDate)).sum
   }
 
-  def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
-    }
-  }
+  def firstCustomer: Option[String] = customers.headOption.map(_.name)
 
 }
 

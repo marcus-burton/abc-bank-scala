@@ -4,8 +4,8 @@ import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
   "Customer" should "statement" in {
-    val checkingAccount: Account = new Account(Account.CHECKING)
-    val savingsAccount: Account = new Account(Account.SAVINGS)
+    val checkingAccount: Account = new Account(Account.Checking)
+    val savingsAccount: Account = new Account(Account.Savings)
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
     checkingAccount.deposit(100.0)
     savingsAccount.deposit(4000.0)
@@ -17,19 +17,35 @@ class CustomerTest extends FlatSpec with Matchers {
   }
 
   it should "testOneAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
+    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.Savings))
     oscar.numberOfAccounts should be(1)
   }
 
   it should "testTwoAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
-    oscar.openAccount(new Account(Account.CHECKING))
+    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.Savings))
+    oscar.openAccount(new Account(Account.Checking))
     oscar.numberOfAccounts should be(2)
   }
 
-  ignore should "testThreeAcounts" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
-    oscar.openAccount(new Account(Account.CHECKING))
+  it should "testThreeAcounts" in {
+    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.Savings))
+    oscar.openAccount(new Account(Account.Checking))
+    oscar.openAccount(new Account(Account.MaxiSavings))
     oscar.numberOfAccounts should be(3)
+  }
+
+  it should "be able to transfer money between acounts" in {
+    val savings = new Account(Account.Savings)
+    val checking = new Account(Account.Checking)
+    val oscar = new Customer("Oscar").openAccount(savings)
+    oscar.openAccount(checking)
+
+    checking.deposit(100.0)
+    savings.deposit(15.0)
+
+    checking.transferTo(savings, 50.0)
+
+    checking.sumTransactions() should be (50.0)
+    savings.sumTransactions() should be (65.0)
   }
 }
