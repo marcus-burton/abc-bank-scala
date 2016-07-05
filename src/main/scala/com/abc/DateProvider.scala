@@ -1,7 +1,6 @@
 package com.abc
 
-import java.util.Calendar
-import java.util.Date
+import java.time.Instant
 
 object DateProvider {
   def getInstance: DateProvider = {
@@ -13,8 +12,8 @@ object DateProvider {
 }
 
 class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
+    def now: Instant = {
+    return Instant.now()
   }
 }
 
