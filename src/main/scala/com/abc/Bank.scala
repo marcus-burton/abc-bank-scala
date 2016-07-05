@@ -1,5 +1,4 @@
 package com.abc
-
 import scala.collection.mutable.ListBuffer
 
 class Bank {
@@ -25,13 +24,16 @@ class Bank {
     for (c <- customers) total += c.totalInterestEarned
     return total
   }
-
+  def totalInterestPaidAccruedDaily: Double = {
+    var total: Double = 0
+    for (c <- customers) total += c.totalInterestEarnedAccruedDaily
+    return BigDecimal(total).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
   def getFirstCustomer: String = {
     try {
       customers = null
       customers(0).name
-    }
-    catch {
+    } catch {
       case e: Exception => {
         e.printStackTrace
         return "Error"

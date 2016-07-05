@@ -1,5 +1,4 @@
 package com.abc
-
 import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
@@ -32,4 +31,25 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.openAccount(new Account(Account.CHECKING))
     oscar.numberOfAccounts should be(3)
   }
+    it should "testTransfer" in {
+    val savings = new Account(Account.SAVINGS)
+    val checking = new Account(Account.CHECKING)
+    val oscar: Customer = new Customer("Oscar").openAccount(savings)
+    oscar.openAccount(checking)
+    checking.deposit(2000)
+    checking.transfer(savings, 1500)
+    checking.sumTransactions(true) should be(500)
+    savings.sumTransactions(true) should be(1500)
+  }
+   it should "testTransferException" in {
+    val savings = new Account(Account.SAVINGS)
+    val checking = new Account(Account.CHECKING)
+    val oscar: Customer = new Customer("Oscar").openAccount(savings)
+    oscar.openAccount(checking)
+    intercept[IllegalArgumentException]{ 
+    checking.transfer(savings, -1500)
+    }
+  } 
+    
+    
 }

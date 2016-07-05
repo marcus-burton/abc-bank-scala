@@ -12,7 +12,7 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
   def numberOfAccounts: Int = accounts.size
 
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
-
+  def totalInterestEarnedAccruedDaily: Double = accounts.map(_.totalInterestEarnedAccruedDaily).sum
   /**
    * This method gets a statement
    */
@@ -46,7 +46,7 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     t.amount match {
       case a if a < 0 => "withdrawal"
       case a if a > 0 => "deposit"
-      case _ => "N/A"
+      case _          => "N/A"
     }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
