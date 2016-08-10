@@ -2,13 +2,11 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-object Account {
-  final val CHECKING: Int = 0
-  final val SAVINGS: Int = 1
-  final val MAXI_SAVINGS: Int = 2
+object Account extends Enumeration {
+  val CHECKING, SAVINGS, MAXI_SAVINGS = Value.id
 }
 
-class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = ListBuffer()) {
+class Account(val accountType: Int, val transactions: ListBuffer[Transaction] = ListBuffer()) {
 
   def deposit(amount: Double) {
     if (amount <= 0)
@@ -39,6 +37,5 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
     }
   }
 
-  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
-
+  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.foldLeft(0.0)(_ + _.amount)
 }

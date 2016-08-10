@@ -11,20 +11,17 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned: Double = accounts.foldLeft(0.0)(_ + _.interestEarned)
 
   /**
    * This method gets a statement
    */
   def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 start
-    var statement: String = null //reset statement to null here
     //JIRA-123 Change by Joe Bloggs 29/7/1988 end
-    val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
-    statement = f"Statement for $name\n" +
+    val totalAcrossAllAccounts = accounts.foldLeft(0.0)(_ + _.sumTransactions())
+    f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
-    statement
   }
 
   private def statementForAccount(a: Account): String = {
@@ -38,7 +35,7 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     }
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
-    val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
+    val totalSummary = s"Total ${toDollars(a.sumTransactions())}"
     accountType + transactionSummary + totalSummary
   }
 
