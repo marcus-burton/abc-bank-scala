@@ -28,12 +28,30 @@ class BankTest extends FlatSpec with Matchers {
     bank.totalInterestPaid should be(2.0)
   }
 
-  it should "maxi savings account" in {
+  it should "maxi savings account with no withdraw" in {
     val bank: Bank = new Bank
     val maxiSavingsAccount: Account = new Account(Account.MAXI_SAVINGS)
     bank.addCustomer(new Customer("Bill").openAccount(maxiSavingsAccount))
     maxiSavingsAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(170.0)
+    bank.totalInterestPaid should be(150.0)
+  }
+
+  it should "maxi savings account with recent withdraw" in {
+    val bank: Bank = new Bank
+    val maxiSavingsAccount: Account = new Account(Account.MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(maxiSavingsAccount))
+    maxiSavingsAccount.deposit(3000.0)
+    maxiSavingsAccount.withdraw(1000.0)
+    bank.totalInterestPaid should be(2.0)
+  }
+
+  it should "maxi savings account with withdraw over 10 days" in {
+    val bank: Bank = new Bank
+    val maxiSavingsAccount: Account = new Account(Account.MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(maxiSavingsAccount))
+    maxiSavingsAccount.deposit(3000.0, DateProvider.getDate(-11))
+
+    bank.totalInterestPaid should be(150.0)
   }
 
   it should "return error when getting first customer if none present" in {

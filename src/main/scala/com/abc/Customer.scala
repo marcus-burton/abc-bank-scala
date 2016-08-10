@@ -2,7 +2,8 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+class Customer(val name: String) {
+  private val accounts: ListBuffer[Account] = ListBuffer[Account]()
 
   def openAccount(account: Account): Customer = {
     accounts += account
@@ -17,8 +18,7 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
    * This method gets a statement
    */
   def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 end
-    val totalAcrossAllAccounts = accounts.foldLeft(0.0)(_ + _.sumTransactions())
+    val totalAcrossAllAccounts = accounts.foldLeft(0.0)(_ + _.balance)
     f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
@@ -33,9 +33,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       case Account.MAXI_SAVINGS =>
         "Maxi Savings Account\n"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
+    val transactionSummary = a.getTransactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
-    val totalSummary = s"Total ${toDollars(a.sumTransactions())}"
+    val totalSummary = s"Total ${toDollars(a.balance)}"
     accountType + transactionSummary + totalSummary
   }
 

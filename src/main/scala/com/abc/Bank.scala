@@ -11,7 +11,7 @@ class Bank {
 
   def customerSummary: String = {
     "Customer Summary" + customers.map(c => "\n - " + c.name + " (" + format(c.numberOfAccounts, "account") + ")")
-      .mkString("")
+      .mkString
   }
 
   private def format(number: Int, word: String): String = {
