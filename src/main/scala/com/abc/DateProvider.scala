@@ -1,20 +1,17 @@
 package com.abc
 
-import java.util.Calendar
-import java.util.Date
+import java.util.{Calendar, Date, GregorianCalendar}
 
 object DateProvider {
-  def getInstance: DateProvider = {
-    if (instance == null) instance = new DateProvider
-    instance
-  }
-
-  private var instance: DateProvider = null
-}
-
-class DateProvider {
   def now: Date = {
-    return Calendar.getInstance.getTime
+    Calendar.getInstance.getTime
+  }
+
+  def getDate(days: Int): Date = {
+    val currentDate = DateProvider.now
+    val cal = new GregorianCalendar()
+    cal.setTime(currentDate)
+    cal.add(Calendar.DAY_OF_MONTH, days)
+    cal.getTime
   }
 }
-
