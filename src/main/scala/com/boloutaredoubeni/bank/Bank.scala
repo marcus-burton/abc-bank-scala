@@ -1,4 +1,4 @@
-package com.abc
+package com.boloutaredoubeni.bank
 
 import scala.collection.mutable.ListBuffer
 

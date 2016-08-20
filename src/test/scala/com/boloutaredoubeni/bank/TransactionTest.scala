@@ -1,4 +1,4 @@
-package com.abc
+package com.boloutaredoubeni.bank
 
 import org.scalatest.{FlatSpec, Matchers}
 

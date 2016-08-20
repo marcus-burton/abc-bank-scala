@@ -1,4 +1,4 @@
-package com.abc
+package com.boloutaredoubeni.bank
 
 case class Transaction(var amount: Double) {
   val transactionDate = DateProvider.getInstance.now

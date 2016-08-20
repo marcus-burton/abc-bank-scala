@@ -1,7 +1,6 @@
-package com.abc
+package com.boloutaredoubeni.bank
 
-import java.util.Calendar
-import java.util.Date
+import java.util.{Calendar, Date}
 
 object DateProvider {
   def getInstance: DateProvider = {
