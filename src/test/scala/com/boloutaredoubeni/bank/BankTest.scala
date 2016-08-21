@@ -33,7 +33,7 @@ class BankTest extends FlatSpec with Matchers {
     val maxiSavingAccount: Account = new MaxiSavingsAccount
     bank.addCustomer(new Customer("Bill").openAccount(maxiSavingAccount))
     maxiSavingAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(170.0)
+    bank.totalInterestPaid should be(150.0)
   }
 
 }

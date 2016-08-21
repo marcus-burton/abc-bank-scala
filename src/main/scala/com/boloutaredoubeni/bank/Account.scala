@@ -12,6 +12,8 @@ object Account {
 abstract sealed class Account(val transactions: ListBuffer[Transaction] = ListBuffer()) {
   val id: String = Account.uuid
 
+  def interestEarned: Double
+
   final def deposit(amount: Double) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
@@ -26,7 +28,7 @@ abstract sealed class Account(val transactions: ListBuffer[Transaction] = ListBu
       transactions += Withdraw(amount)
   }
 
-  def interestEarned: Double
+
 
   final def sumTransactions(checkAllTransactions: Boolean = true) = transactions.map(_.amount).sum
 }
@@ -48,8 +50,17 @@ final case class SavingsAccount() extends Account {
 final case class MaxiSavingsAccount() extends Account {
   override def interestEarned: Double = {
     val amount = sumTransactions()
-    if (amount <= 1000)  return amount * 0.02
-    if (amount <= 2000)  return 20 + (amount - 1000) * 0.05
-    70 + (amount - 2000) * 0.1
+    val lastWithdrawalTime = transactions.collect {
+      case w: Withdraw => w
+    }.map {
+      _.transactionDate.toEpochMilli
+    }.foldLeft(0L) {
+      _ min _
+    }
+
+    if (DateProvider.daysPassed(lastWithdrawalTime) < 10)
+      amount * 0.05
+    else
+      amount * 0.001
   }
 }
