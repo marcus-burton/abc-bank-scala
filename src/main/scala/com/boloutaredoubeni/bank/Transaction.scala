@@ -1,6 +1,15 @@
 package com.boloutaredoubeni.bank
 
-case class Transaction(var amount: Double) {
+sealed trait Transaction {
+  val _amount: Double
+  def amount: Double
   val transactionDate = DateProvider.getInstance.now
 }
 
+case class Deposit(_amount: Double) extends Transaction {
+  override def amount = _amount
+}
+
+case class Withdraw(_amount: Double) extends Transaction {
+  override def amount = -_amount
+}

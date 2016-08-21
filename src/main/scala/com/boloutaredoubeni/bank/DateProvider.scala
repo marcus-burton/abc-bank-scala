@@ -1,19 +1,17 @@
 package com.boloutaredoubeni.bank
 
-import java.util.{Calendar, Date}
+import java.time.Instant
 
 object DateProvider {
-  def getInstance: DateProvider = {
+  def getInstance = {
     if (instance == null) instance = new DateProvider
     instance
   }
 
-  private var instance: DateProvider = null
+  private var instance: DateProvider = _
 }
 
-class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
-  }
+final class DateProvider {
+  def now = Instant.now()
 }
 
