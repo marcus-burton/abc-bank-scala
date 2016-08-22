@@ -1,8 +1,8 @@
-package com.abc
+package com.boloutaredoubeni.bank
 
 import scala.collection.mutable.ListBuffer
 
-class Bank {
+final class Bank {
   var customers = new ListBuffer[Customer]
 
   def addCustomer(customer: Customer) {
@@ -23,19 +23,13 @@ class Bank {
   def totalInterestPaid: Double = {
     var total: Double = 0
     for (c <- customers) total += c.totalInterestEarned
-    return total
+    total
   }
 
-  def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
+  def firstCustomer: Option[Customer] = {
+    customers.toList match {
+      case fst :: _ => Some(fst)
+      case _ => None
     }
   }
 

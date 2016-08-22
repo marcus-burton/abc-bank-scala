@@ -1,6 +1,7 @@
-package com.abc
+package com.boloutaredoubeni.bank
 
 import scala.collection.mutable.ListBuffer
+import scala.util.{Failure, Try}
 
 class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
 
@@ -9,31 +10,48 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     this
   }
 
-  def numberOfAccounts: Int = accounts.size
+  def transfer(amount: Double, from: Account, to: Account) = {
+    if (from.id != to.id) {
+      for {
+        withdrawAccount <- accounts
+        if withdrawAccount.id == from.id
+      } {
+        Try(withdrawAccount.withdraw(amount)) match {
+          case Failure(ex) => throw ex
+          case _ => ()
+        }
+      }
 
+      for {
+        depositAccount <- accounts
+        if depositAccount.id == to.id
+      } {
+        Try(depositAccount.deposit(amount)) match {
+          case Failure(ex) => throw ex
+          case _ => ()
+        }
+      }
+    }
+  }
+
+  def numberOfAccounts: Int = accounts.size
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
 
-  /**
-   * This method gets a statement
-   */
-  def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 start
-    var statement: String = null //reset statement to null here
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 end
+  def statement: String = {
     val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
-    statement = f"Statement for $name\n" +
+    val accountStatement = f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
-    statement
+    accountStatement
   }
 
   private def statementForAccount(a: Account): String = {
-    val accountType = a.accountType match {
-      case Account.CHECKING =>
+    val accountType = a match {
+      case CheckingAccount() =>
         "Checking Account\n"
-      case Account.SAVINGS =>
+      case SavingsAccount() =>
         "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
+      case MaxiSavingsAccount() =>
         "Maxi Savings Account\n"
     }
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
