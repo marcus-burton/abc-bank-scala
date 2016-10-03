@@ -12,6 +12,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
   def numberOfAccounts: Int = accounts.size
 
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  private var fromAccount = None: Option[Account]
+  private var toAccount = None: Option[Account]
+
 
   /**
    * This method gets a statement
@@ -49,6 +52,41 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       case _ => "N/A"
     }
 
-  private def toDollars(number: Double): String = f"$$$number%.2f"
+ private def toDollars(number: Double): String = f"$$$number%.2f"
+    
+  // Adding method to find is account exist for Customer to and from transfer is happening
+  private def accountExist(account: Account): Boolean = {
+    accounts.contains(account)
+  }
+
+  def transferFrom(account: Account): Customer={
+    if (!accountExist(account))
+      throw new IllegalArgumentException(f"No Such Account exist for $name\n")
+    else{
+      fromAccount = Some(account)
+      this}
+  }
+  def transferTo(account: Account): Customer={
+    if (!accountExist(account))
+      throw new IllegalArgumentException(f"No Such Account exist for $name\n")
+    else{
+      toAccount = Some(account)
+      this}
+  }
+  
+  def transferAmount(amount: Double) = {
+    try {
+    fromAccount match {
+      case Some(fAccount) if amount > 0 && (fAccount.sumTransactions(true) >= amount) => toAccount match {
+        			case Some(tAccount) => { fAccount.withdraw(amount); tAccount.deposit(amount) }
+        			case None => throw new IllegalArgumentException(f"Transaction failed \n")
+      			}
+      case None => throw new IllegalArgumentException(f"Transaction failed \n")
+    }
+  } catch{
+    case ex: Exception => printf(s"${ex.getMessage()} \n")
+  }
+  }
+
 }
 
