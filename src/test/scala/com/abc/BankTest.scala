@@ -35,5 +35,15 @@ class BankTest extends FlatSpec with Matchers {
     checkingAccount.deposit(3000.0)
     bank.totalInterestPaid should be(170.0)
   }
+  
+  it should "maxi savings accounts rate as 5% assuming no withdrawals" in {
+    val bank: Bank = new Bank
+    val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    checkingAccount.deposit(300.000)
+    checkingAccount.withdraw(100.000)
+    checkingAccount.deposit(10.000)
+    bank.totalInterestPaid should be(0.210)
+  }
 
 }
