@@ -8,20 +8,17 @@ object Account {
   final val MAXI_SAVINGS: Int = 2
 }
 
-class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = ListBuffer()) {
+class Account(val accountType: Int, transactions_ : ListBuffer[Transaction] = ListBuffer()) {
 
-  def deposit(amount: Double) {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
-    else
-      transactions += Transaction(amount)
-  }
+  def transactions: List[Transaction] = transactions_.toList
 
-  def withdraw(amount: Double) {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
-    else
-      transactions += Transaction(-amount)
+  def deposit(amount: Double):Unit = addTransaction(amount, deposit =true)
+
+  def withdraw(amount: Double):Unit = addTransaction(-amount, deposit=false)
+
+  private def addTransaction(amount: Double, deposit: Boolean): Unit = {
+    require(if(deposit) amount > 0 else amount < 0, "amount must be greater than zero")
+    transactions_ += Transaction(amount)
   }
 
   def interestEarned: Double = {
@@ -40,5 +37,4 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
   }
 
   def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
-
 }
