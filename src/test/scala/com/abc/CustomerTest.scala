@@ -4,8 +4,8 @@ import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
   "Customer statement" should "show transactions and totals for each of their accounts" in {
-    val checkingAccount: Account = new Account(Account.Checking)
-    val savingsAccount: Account = new Account(Account.Savings)
+    val checkingAccount: Account = new Account(Checking)
+    val savingsAccount: Account = new Account(Savings)
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
     checkingAccount.deposit(100.0)
     savingsAccount.deposit(4000.0)
@@ -18,23 +18,23 @@ class CustomerTest extends FlatSpec with Matchers {
 
   "Customer" should "be able to open a account" in {
     val oscar: Customer = new Customer("Oscar")
-      .openAccount(new Account(Account.Savings))
+      .openAccount(new Account(Savings))
     oscar.numberOfAccounts should be(1)
   }
 
   it should "be able to open two accounts" in {
     val oscar: Customer = new Customer("Oscar")
-      .openAccount(new Account(Account.Savings))
-      .openAccount(new Account(Account.Checking))
+      .openAccount(new Account(Savings))
+      .openAccount(new Account(Checking))
 
     oscar.numberOfAccounts should be(2)
   }
 
   it should "be able to open three accounts" in {
     val oscar: Customer = new Customer("Oscar")
-      .openAccount(new Account(Account.Savings))
-      .openAccount(new Account(Account.Checking))
-      .openAccount(new Account(Account.MaxiSavings))
+      .openAccount(new Account(Savings))
+      .openAccount(new Account(Checking))
+      .openAccount(new Account(MaxiSavings))
 
     oscar.numberOfAccounts should be(3)
   }
