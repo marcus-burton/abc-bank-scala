@@ -3,7 +3,7 @@ package com.abc
 import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
-  "Customer" should "statement" in {
+  "Customer statement" should "show transactions and totals for each of their accounts" in {
     val checkingAccount: Account = new Account(Account.CHECKING)
     val savingsAccount: Account = new Account(Account.SAVINGS)
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
@@ -16,20 +16,26 @@ class CustomerTest extends FlatSpec with Matchers {
       "\nTotal In All Accounts $3900.00")
   }
 
-  it should "testOneAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
+  "Customer" should "be able to open a account" in {
+    val oscar: Customer = new Customer("Oscar")
+      .openAccount(new Account(Account.SAVINGS))
     oscar.numberOfAccounts should be(1)
   }
 
-  it should "testTwoAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
-    oscar.openAccount(new Account(Account.CHECKING))
+  it should "be able to open two accounts" in {
+    val oscar: Customer = new Customer("Oscar")
+      .openAccount(new Account(Account.SAVINGS))
+      .openAccount(new Account(Account.CHECKING))
+
     oscar.numberOfAccounts should be(2)
   }
 
-  ignore should "testThreeAcounts" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
-    oscar.openAccount(new Account(Account.CHECKING))
+  it should "be able to open three accounts" in {
+    val oscar: Customer = new Customer("Oscar")
+      .openAccount(new Account(Account.SAVINGS))
+      .openAccount(new Account(Account.CHECKING))
+      .openAccount(new Account(Account.MAXI_SAVINGS))
+
     oscar.numberOfAccounts should be(3)
   }
 }
