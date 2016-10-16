@@ -45,5 +45,25 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.numberOfAccounts should be(3)
   }
 
-  it should "be able to transfer money between accounts"
+  it should "be able to transfer money between accounts" in {
+    val oscar: Customer = new Customer("Oscar")
+      .openAccount(accountType = Savings)
+      .openAccount(accountType = Checking)
+      .openAccount(accountType = MaxiSavings)
+
+    val checkingAccount: Option[oscar.Account] = oscar.accounts.find(_.accountType == Checking)
+    val savingAccount: Option[oscar.Account] = oscar.accounts.find(_.accountType == Savings)
+
+    checkingAccount.foreach(_.deposit(1000))
+
+    for {
+      account <- checkingAccount
+      account1 <- savingAccount
+    } {
+      oscar.transfer(sourceAccount = account, destinationAccount = account1, 500)
+    }
+
+    checkingAccount.map(_.sumTransactions()) should be(Some(500.0))
+    savingAccount.map(_.sumTransactions()) should be(Some(500.0))
+  }
 }
