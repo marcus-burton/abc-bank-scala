@@ -30,6 +30,14 @@ class Customer(val name: String) {
     statement
   }
 
+  def transfer(sourceAccount: Account, destinationAccount: Account, amount: Double): Customer = {
+    val transactionState = new TransactionState(isComplete = false)
+    sourceAccount.withdraw(amount, transactionState)
+    destinationAccount.deposit(amount, transactionState)
+    transactionState.isComplete = true
+    this
+  }
+
   private def statementForAccount(account: Account): String = {
     val transactionSummary = account.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
@@ -45,17 +53,20 @@ class Customer(val name: String) {
       case _ => "N/A"
     }
 
-  class Account(val accountType: AccountType, transactions_ : ListBuffer[Transaction] = ListBuffer()) {
+  class Account private[Customer](val accountType: AccountType) {
+    private var transactions_ : ListBuffer[Transaction] = ListBuffer()
 
     def transactions: List[Transaction] = transactions_.toList
 
-    def deposit(amount: Double):Unit = addTransaction(amount, deposit =true)
+    def deposit(amount: Double, transactionState: TransactionState = new TransactionState(isComplete = true)):Unit =
+      addTransaction(amount, deposit =true, transactionState)
 
-    def withdraw(amount: Double):Unit = addTransaction(-amount, deposit=false)
+    def withdraw(amount: Double, transactionState: TransactionState = new TransactionState(isComplete = true)):Unit =
+      addTransaction(-amount, deposit=false, transactionState)
 
-    private def addTransaction(amount: Double, deposit: Boolean): Unit = {
+    private def addTransaction(amount: Double, deposit: Boolean, transactionState: TransactionState): Unit = {
       require(if(deposit) amount > 0 else amount < 0, "amount must be greater than zero")
-      transactions_ += Transaction(amount)
+      transactions_ += new Transaction(amount, transactionState)
     }
 
     def interestEarned: Double = accountType.interestEarned(amount = sumTransactions())
