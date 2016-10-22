@@ -1,7 +1,6 @@
 package com.abc.bank
 
 import scala.collection.mutable.ListBuffer
-import scala.util.{Try, Success, Failure}
 import com.abc.bank.customer.Customer
 import com.abc.bank.account.Account
 
