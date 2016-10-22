@@ -37,15 +37,14 @@ case class Account(accountType: AccountType, transactions: ListBuffer[Transactio
         if (amount <= 1000) amount * 0.001
         else 1 + (amount - 1000) * 0.002
       case MAXI_SAVINGS =>
-        val cal = DateProvider.getInstance
-        val msCutoffTime = cal.now.getTime -(MAXI_SAVINGS_PENALTY_DAYS*ONE_DAY)
+        val msCutoffTime = DateProvider.getInstance.now.getTime -(MAXI_SAVINGS_PENALTY_DAYS*ONE_DAY)
         val maxi_savings_penalty = !transactions.find( e => {
           e.amount < 0 && (msCutoffTime < e.transactionDate.getTime)
         }).isEmpty
         if (amount <= 1000)
           amount * 0.02
         else if (amount <= 2000) {
-          if (maxi_savings_penalty)
+          if (!maxi_savings_penalty)
             20 + (amount - 1000) * 0.05
           else
             20 + (amount - 1000) * 0.001

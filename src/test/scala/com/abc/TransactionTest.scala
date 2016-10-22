@@ -16,25 +16,6 @@ class TransactionTest extends FlatSpec with Matchers {
   }
 
 
-  it should "calculate interestEarned no penalty" in {
-    val bank: Bank = new Bank
-    val bill: Customer = new Customer("Bill")
-    val maxiAccount: Account = new Account(MAXI_SAVINGS)
-    bill.openAccount(maxiAccount)
-    bank.addCustomer(bill)
-    maxiAccount.deposit(10000.0)
-    maxiAccount.interestEarned should be(870.00)
-  }
 
-  it should "calculate interestEarned with penalty" in {
-    val bank: Bank = new Bank
-    val bill: Customer = new Customer("Bill")
-    val maxiAccount: Account = new Account(MAXI_SAVINGS)
-    bill.openAccount(maxiAccount)
-    bank.addCustomer(bill)
-    maxiAccount.deposit(10000.0)
-    maxiAccount.withdraw(1000.0)
-    maxiAccount.interestEarned should be (770.0)
-  }
 
 }

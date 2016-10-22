@@ -143,4 +143,26 @@ class BankTest extends FlatSpec with Matchers {
     the [IllegalArgumentException] thrownBy(bank.transferBetweenAccounts(bill, savingsAccount, checkingAccount, 0.00)) should have message "requirement failed"
   }
 
+  it should "calculate interestEarned no penalty" in {
+    val bank: Bank = new Bank
+    val bill: Customer = new Customer("Bill")
+    val maxiAccount: Account = new Account(MAXI_SAVINGS)
+    bill.openAccount(maxiAccount)
+    bank.addCustomer(bill)
+    maxiAccount.deposit(1900.0)
+    maxiAccount.interestEarned should be(65.00)
+  }
+
+  it should "calculate interestEarned with penalty" in {
+    val bank: Bank = new Bank
+    val bill: Customer = new Customer("Bill")
+    val maxiAccount: Account = new Account(MAXI_SAVINGS)
+    bill.openAccount(maxiAccount)
+    bank.addCustomer(bill)
+    maxiAccount.deposit(1900.0)
+    maxiAccount.withdraw(100.0)
+    maxiAccount.interestEarned should be(20.8)
+  }
+
+
 }
