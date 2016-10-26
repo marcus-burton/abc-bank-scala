@@ -17,19 +17,19 @@ class Customer(val name: String, val accounts: ListBuffer[Account] = ListBuffer(
    * This method gets a statement
    */
   def getStatement: String = {
-    val totalAcrossAllAccounts: Double = accounts.map(_.sumTransactions()).sum
+    val totalAcrossAllAccounts: Double = accounts.map(_.sumTransactions).sum
     f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
   }
 
   private def statementForAccount(a: Account): String = {
-    val accountType: String = a.accountType match {
-      case Account.CHECKING =>
+    val accountType: String = a match {
+      case CheckingAccount() =>
         "Checking Account\n"
-      case Account.SAVINGS =>
+      case SavingsAccount() =>
         "Savings Account\n"
-      case Account.MAXI_SAVINGS =>
+      case MaxiSavingsAccount() =>
         "Maxi Savings Account\n"
     }
     val transactionSummary: String =

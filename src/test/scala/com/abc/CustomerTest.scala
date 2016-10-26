@@ -3,9 +3,18 @@ package com.abc
 import org.scalatest.{Matchers, FlatSpec}
 
 class CustomerTest extends FlatSpec with Matchers {
-  "Customer" should "statement" in {
-    val checkingAccount: Account = new Account(Account.CHECKING)
-    val savingsAccount: Account = new Account(Account.SAVINGS)
+  it should "be able to transfer between their accounts" in {
+    val checkingAccount: Account = new CheckingAccount()
+    val savingsAccount: Account = new SavingsAccount()
+    val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
+    checkingAccount.deposit(100.0)
+    savingsAccount.deposit(4000.0)
+    savingsAccount.withdraw(200.0)
+  }
+
+  "Customer" should "be able to get account statement" in {
+    val checkingAccount: Account = new CheckingAccount()
+    val savingsAccount: Account = new SavingsAccount()
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
     checkingAccount.deposit(100.0)
     savingsAccount.deposit(4000.0)
@@ -16,20 +25,21 @@ class CustomerTest extends FlatSpec with Matchers {
       "\nTotal In All Accounts $3900.00")
   }
 
-  it should "testOneAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
+  it should "be able to open one account" in {
+    val oscar: Customer = new Customer("Oscar").openAccount(new SavingsAccount())
     oscar.numberOfAccounts should be(1)
   }
 
-  it should "testTwoAccount" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
-    oscar.openAccount(new Account(Account.CHECKING))
+  it should "be able to open two accounts" in {
+    val oscar: Customer = new Customer("Oscar").openAccount(new SavingsAccount())
+    oscar.openAccount(new CheckingAccount())
     oscar.numberOfAccounts should be(2)
   }
 
-  ignore should "testThreeAcounts" in {
-    val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
-    oscar.openAccount(new Account(Account.CHECKING))
+  it should "be able to open three accounts" in {
+    val oscar: Customer = new Customer("Oscar").openAccount(new SavingsAccount())
+    oscar.openAccount(new CheckingAccount())
+    oscar.openAccount(new MaxiSavingsAccount())
     oscar.numberOfAccounts should be(3)
   }
 }
