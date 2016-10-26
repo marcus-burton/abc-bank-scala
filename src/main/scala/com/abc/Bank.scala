@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 class Bank {
   var customers = new ListBuffer[Customer]
 
-  def addCustomer(customer: Customer) {
+  def addCustomer(customer: Customer): Unit = {
     customers += customer
   }
 
@@ -23,19 +23,18 @@ class Bank {
   def totalInterestPaid: Double = {
     var total: Double = 0
     for (c <- customers) total += c.totalInterestEarned
-    return total
+    total
   }
 
   def getFirstCustomer: String = {
     try {
       customers = null
-      customers(0).name
+      customers.head.name
     }
     catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
+      case e: Exception =>
+        e.printStackTrace()
+        "Error"
     }
   }
 

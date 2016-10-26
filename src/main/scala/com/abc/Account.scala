@@ -10,14 +10,14 @@ object Account {
 
 class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = ListBuffer()) {
 
-  def deposit(amount: Double) {
+  def deposit(amount: Double): Unit = {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
       transactions += Transaction(amount)
   }
 
-  def withdraw(amount: Double) {
+  def withdraw(amount: Double): Unit = {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else

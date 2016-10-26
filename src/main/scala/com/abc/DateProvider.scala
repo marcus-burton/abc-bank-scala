@@ -14,7 +14,7 @@ object DateProvider {
 
 class DateProvider {
   def now: Date = {
-    return Calendar.getInstance.getTime
+    Calendar.getInstance.getTime
   }
 }
 
