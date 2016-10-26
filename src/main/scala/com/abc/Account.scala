@@ -1,5 +1,6 @@
 package com.abc
 
+import com.github.nscala_time.time.Imports._
 import scala.collection.mutable.ListBuffer
 
 sealed trait Account {
@@ -27,6 +28,11 @@ sealed trait Account {
 
   def sumTransactions: Double = transactions.map(_.amount).sum
 
+  protected[this] def lastWithdrawl: DateTime = {
+    val withdrawls: ListBuffer[Transaction] = transactions.filter(_.amount < 0)
+    val last: Transaction = withdrawls.minBy(_.date.getMillis)
+    last.date
+  }
 }
 
 final case class CheckingAccount() extends Account {
@@ -45,6 +51,18 @@ final case class SavingsAccount() extends Account {
 }
 
 final case class MaxiSavingsAccount() extends Account {
+
+  def interestEarned2: Double = {
+    val amount: Double = sumTransactions
+    // interest rate of 5% assuming no withdrawals in the past 10 days
+    if(DateTime.now > lastWithdrawl + 10.days) {
+      0.05 * amount
+    // otherwise 0.1%
+    } else {
+      0.001 * amount
+    }
+  }
+
   override def interestEarned: Double = {
     val amount: Double = sumTransactions
     /* Change Maxi-Savings accounts to have an interest rate of 5% assuming no withdrawals in the past 10 days otherwise 0.1% */

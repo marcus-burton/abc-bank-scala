@@ -11,3 +11,5 @@ resolvers += "johnreed2 bintray" at "http://dl.bintray.com/content/johnreed2/mav
 libraryDependencies += "com.github.johnreedlol" %% "scala-trace-debug" % "3.0.6"
 
 scalacOptions ++= Seq("-Xfatal-warnings", "-unchecked", "-feature", "-Xlint", "-Yinline-warnings", "-Ywarn-inaccessible", "-Ywarn-nullary-override", "-Ywarn-nullary-unit")
+
+libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.14.0"
