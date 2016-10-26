@@ -3,17 +3,16 @@ package com.abc
 import scala.collection.mutable.ListBuffer
 
 class Bank {
-  var customers = new ListBuffer[Customer]
+  val customers = new ListBuffer[Customer]
 
-  def addCustomer(customer: Customer) {
+  def addCustomer(customer: Customer): Unit = {
     customers += customer
   }
 
   def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
+    customers.foldLeft("Customer Summary"){ (acc: String, customer: Customer) =>
+      acc + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
+    }
   }
 
   private def format(number: Int, word: String): String = {
@@ -21,21 +20,17 @@ class Bank {
   }
 
   def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+    customers.foldLeft(0.0){ (sum, customer) => sum + customer.totalInterestEarned }
   }
 
   def getFirstCustomer: String = {
     try {
-      customers = null
-      customers(0).name
+      customers.head.name
     }
     catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
+      case e: Exception =>
+        e.printStackTrace()
+        "Error"
     }
   }
 
