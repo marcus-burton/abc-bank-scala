@@ -6,17 +6,21 @@ sealed trait Account {
   val transactions: ListBuffer[Transaction] = ListBuffer()
 
   def deposit(amount: Double): Unit = {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
-    else
-      transactions += Transaction(amount)
+    require(amount >= 0, "amount must be greater than zero")
+    transactions += Transaction(amount)
+  }
+
+  def transfer(other: Account, amount: Double): Unit = {
+    require(amount >= 0, "amount must be greater than zero")
+    require(amount <= sumTransactions, "you cannot transfer more money than you have")
+    this.withdraw(amount)
+    other.deposit(amount)
   }
 
   def withdraw(amount: Double): Unit = {
-    if (amount <= 0)
-      throw new IllegalArgumentException("amount must be greater than zero")
-    else
-      transactions += Transaction(-amount)
+    require(amount >= 0, "amount must be greater than zero")
+    require(amount <= sumTransactions, "you cannot withdraw more money than you have")
+    transactions += Transaction(-amount)
   }
 
   def interestEarned: Double
