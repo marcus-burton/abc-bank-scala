@@ -9,7 +9,11 @@ object Account {
   object MAXI_SAVINGS extends Type
 }
 
-class Account(val accountType: Account.Type, var transactions: ListBuffer[Transaction] = ListBuffer()) {
+sealed trait Account2 {
+
+}
+
+class Account(val accountType: Account.Type, val transactions: ListBuffer[Transaction] = ListBuffer()) {
 
   def deposit(amount: Double): Unit = {
     if (amount <= 0)
