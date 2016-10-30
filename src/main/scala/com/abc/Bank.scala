@@ -1,9 +1,7 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
-
 class Bank {
-  var customers = new ListBuffer[Customer]
+  var customers = new Customers
 
   def addCustomer(customer: Customer): Unit = customers += customer
 

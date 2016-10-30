@@ -1,9 +1,7 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
-
 class Customer(val name: String) {
-  private val accounts_ : ListBuffer[Account] = ListBuffer()
+  private val accounts_  = new Accounts()
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 
@@ -54,7 +52,7 @@ class Customer(val name: String) {
     }
 
   class Account private[Customer](val accountType: AccountType) {
-    private var transactions_ : ListBuffer[Transaction] = ListBuffer()
+    private var transactions_ = new Transactions()
 
     def transactions: List[Transaction] = transactions_.toList
 
