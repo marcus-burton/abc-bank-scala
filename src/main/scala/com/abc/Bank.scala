@@ -1,36 +1,24 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+object Bank {
 
-class Bank {
-  var customers = new ListBuffer[Customer]
+  def addCustomer(customer: Customer, customers: Customers): Customers = customers :+ customer
 
-  def addCustomer(customer: Customer): Unit = customers += customer
-
-  def totalInterestPaid: Double =  customers.map(_.totalInterestEarned).sum
+  def totalInterestPaid(customers: Customers, accounts: Accounts, transactions: Transactions): Double =
+    customers.map(customer => customer.totalInterestEarned(customer.getAccounts(accounts), transactions)).sum
 
   private def format(number: Int, word: String): String = s"$number ${if (number == 1) word else word +"s"}"
 
-  def customerSummary: String = {
+  def customerSummary(customers: Customers, accounts: Accounts): String = {
     val customerSummary =
-      customers
-        .map(customer => s" - ${customer.name} (${format(customer.numberOfAccounts, "account")})")
-        .mkString("\n")
+      customers  map { customer =>
+        val customerAccounts = customer.getAccounts(accounts)
+        s" - ${customer.name} (${format(customer.numberOfAccounts(customerAccounts), "account")})"
+      } mkString "\n"
 
     s"""Customer Summary
        |$customerSummary""".stripMargin
   }
 
-  def firstCustomer: String = {
-    try {
-      customers = null
-      customers.head.name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
-    }
-  }
+  def firstCustomer(customers: Customers): Option[String] = customers.headOption.map(_.name)
 }
