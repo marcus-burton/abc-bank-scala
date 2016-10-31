@@ -1,44 +1,24 @@
 package com.abc
 
-import scala.collection.mutable.ListBuffer
+object Bank {
 
-class Bank {
-  var customers = new ListBuffer[Customer]
+  def addCustomer(customer: Customer, customers: Customers): Customers = customers :+ customer
 
-  def addCustomer(customer: Customer) {
-    customers += customer
+  def totalInterestPaid(customers: Customers, accounts: Accounts, transactions: Transactions): Double =
+    customers.map(customer => customer.totalInterestEarned(customer.getAccounts(accounts), transactions)).sum
+
+  private def format(number: Int, word: String): String = s"$number ${if (number == 1) word else word +"s"}"
+
+  def customerSummary(customers: Customers, accounts: Accounts): String = {
+    val customerSummary =
+      customers  map { customer =>
+        val customerAccounts = customer.getAccounts(accounts)
+        s" - ${customer.name} (${format(customer.numberOfAccounts(customerAccounts), "account")})"
+      } mkString "\n"
+
+    s"""Customer Summary
+       |$customerSummary""".stripMargin
   }
 
-  def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
-  }
-
-  private def format(number: Int, word: String): String = {
-    number + " " + (if (number == 1) word else word + "s")
-  }
-
-  def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
-  }
-
-  def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
-    }
-  }
-
+  def firstCustomer(customers: Customers): Option[String] = customers.headOption.map(_.name)
 }
-
-

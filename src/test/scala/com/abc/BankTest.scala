@@ -1,39 +1,56 @@
 package com.abc
 
-import org.scalatest.{Matchers, FlatSpec}
+import com.abc
+import org.scalatest.{FlatSpec, Matchers}
 
 class BankTest extends FlatSpec with Matchers {
 
   "Bank" should "customer summary" in {
-    val bank: Bank = new Bank
-    var john: Customer = new Customer("John").openAccount(new Account(Account.CHECKING))
-    bank.addCustomer(john)
-    bank.customerSummary should be("Customer Summary\n - John (1 account)")
+    val (_, customers: Customers, accounts: Accounts) = openAccount("John", Checking)
+
+    Bank.customerSummary(customers, accounts) should be("Customer Summary\n - John (1 account)")
   }
 
   it should "checking account" in {
-    val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(Account.CHECKING)
-    val bill: Customer = new Customer("Bill").openAccount(checkingAccount)
-    bank.addCustomer(bill)
-    checkingAccount.deposit(100.0)
-    bank.totalInterestPaid should be(0.1)
+    val (bill: Customer, customers: Customers, accounts: Accounts) = openAccount("Bill", Checking)
+    val checkingAccount = bill.getAccounts(accounts)
+      .collectFirst {
+        case account if account.accountType == Checking => account
+      }
+
+    checkingAccount.map(_.deposit(100.0, Nil)) map { transactions =>
+      Bank.totalInterestPaid(customers, accounts, transactions)
+    } should be(Some(0.1))
+  }
+
+  private def openAccount(customerName: String, accountType: AccountType): (Customer, abc.Customers, abc.Accounts) = {
+    val bill: Customer = Customer(customerName)
+    val customers: Customers = Bank.addCustomer(bill, Nil)
+    val accounts: Accounts = bill.openAccount(accountType, Nil)
+    (bill, customers, accounts)
   }
 
   it should "savings account" in {
-    val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(Account.SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(1500.0)
-    bank.totalInterestPaid should be(2.0)
+    val (bill: Customer, customers: Customers, accounts: Accounts) = openAccount("Bill", Savings)
+    val savingAccount = bill.getAccounts(accounts)
+      .collectFirst {
+        case account if account.accountType == Savings => account
+      }
+
+    savingAccount.map(_.deposit(1500.0, Nil)) map { transactions =>
+      Bank.totalInterestPaid(customers, accounts, transactions)
+    } should be(Some(2.0))
   }
 
   it should "maxi savings account" in {
-    val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(170.0)
+    val (bill: Customer, customers: Customers, accounts: Accounts) = openAccount("Bill", MaxiSavings)
+    val maxiSavingsAccount: Option[bill.Account] = bill.getAccounts(accounts).collectFirst {
+      case account if account.accountType == MaxiSavings => account
+    }
+
+    maxiSavingsAccount.map(_.deposit(3000.0, Nil)) map { transactions =>
+      Bank.totalInterestPaid(customers, accounts, transactions)
+    } should be(Some(170.0))
   }
 
 }
