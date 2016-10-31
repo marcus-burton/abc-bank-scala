@@ -1,74 +1,84 @@
 package com.abc
 
-class Customer(val name: String) {
-  private val accounts_  = new Accounts()
+import java.util.Date
+
+case class Customer(name: String) {
+  type Accounts = List[Account]
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 
-  def numberOfAccounts: Int = accounts_.size
+  def numberOfAccounts(accounts: Accounts) = accounts.size
 
-  def totalInterestEarned: Double = accounts_.map(_.interestEarned).sum
+  def totalInterestEarned(accounts: Accounts, transactions: Transactions): Double =
+    accounts map { account =>
+      account.interestEarned(account.getTransactions(transactions))
+    } sum
 
-  def accounts: List[Account] = accounts_.toList
-
-  def openAccount(accountType: AccountType): Customer = {
-    accounts_ += new Account(accountType)
-    this
+  def getAccounts(accounts: com.abc.Accounts): Accounts = accounts flatMap { account =>
+    if(account.outer == this) Some(account.asInstanceOf[Account]) else None
   }
 
-  def statement: String = {
+  def openAccount(accountType: AccountType, accounts: com.abc.Accounts ): com.abc.Accounts = accounts :+ new Account(accountType)
+
+  def statement(accounts: Accounts, transactions: Transactions): String = {
     //JIRA-123 Change by Joe Bloggs 29/7/1988 start
     var statement: String = null //reset statement to null here
     //JIRA-123 Change by Joe Bloggs 29/7/1988 end
-    val totalAcrossAllAccounts = accounts_.map(_.sumTransactions()).sum
+    val totalAcrossAllAccounts = accounts.map (account => account.sumTransactions(account.getTransactions(transactions))).sum
     statement =
       f"""Statement for $name
-         |${accounts_.map(statementForAccount).mkString("\n", "\n\n", "\n")}
+         |${accounts.map(statementForAccount(_, transactions)).mkString("\n", "\n\n", "\n")}
          |Total In All Accounts ${toDollars(totalAcrossAllAccounts)}""".stripMargin
     statement
   }
 
-  def transfer(sourceAccount: Account, destinationAccount: Account, amount: Double): Customer = {
-    val transactionState = new TransactionState(isComplete = false)
-    sourceAccount.withdraw(amount, transactionState)
-    destinationAccount.deposit(amount, transactionState)
-    transactionState.isComplete = true
-    this
-  }
+  def transfer(sourceAccount: Account, destinationAccount: Account, amount: Double, transactions: Transactions): Transactions =
+    destinationAccount.deposit(
+      amount,
+      sourceAccount.withdraw(amount, transactions)
+    )
 
-  private def statementForAccount(account: Account): String = {
-    val transactionSummary = account.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
+  private def statementForAccount(account: Account, transactions: Transactions): String = {
+    val transactionSummary = account.getTransactions(transactions).map(t => s"${t.text} ${toDollars(t.amount.abs)}")
       .mkString("  ", "\n  ", "\n")
-    val totalSummary = s"Total ${toDollars(account.transactions.map(_.amount).sum)}"
+    val totalSummary = s"Total ${toDollars(account.getTransactions(transactions).map(_.amount).sum)}"
     s"""${account.accountType.label}
        |$transactionSummary$totalSummary""".stripMargin
   }
 
-  private def withdrawalOrDepositText(transaction: Transaction) =
-    transaction.amount match {
-      case a if a < 0 => "withdrawal"
-      case a if a > 0 => "deposit"
-      case _ => "N/A"
-    }
-
   class Account private[Customer](val accountType: AccountType) {
-    private var transactions_ = new Transactions()
+    private[Customer] val outer: Customer = Customer.this
 
-    def transactions: List[Transaction] = transactions_.toList
+    def getTransactions(transactions: Transactions): List[Transaction]  =
+      transactions.filter(_.outer == this).map(_.asInstanceOf[Transaction])
 
-    def deposit(amount: Double, transactionState: TransactionState = new TransactionState(isComplete = true)):Unit =
-      addTransaction(amount, deposit =true, transactionState)
+    def deposit(amount: Double, transactions: Transactions): Transactions =
+      addTransaction(amount, transactions, deposit =true)
 
-    def withdraw(amount: Double, transactionState: TransactionState = new TransactionState(isComplete = true)):Unit =
-      addTransaction(-amount, deposit=false, transactionState)
+    def withdraw(amount: Double, transactions: Transactions): Transactions =
+      addTransaction(-amount, transactions, deposit=false)
 
-    private def addTransaction(amount: Double, deposit: Boolean, transactionState: TransactionState): Unit = {
+    private def addTransaction(
+      amount: Double,transactions: Transactions, deposit: Boolean
+    ): Transactions = {
       require(if(deposit) amount > 0 else amount < 0, "amount must be greater than zero")
-      transactions_ += new Transaction(amount, transactionState)
+      val result: Transactions = transactions :+ new Transaction(amount)
+      result
     }
 
-    def interestEarned: Double = accountType.interestEarned(amount = sumTransactions())
+    def interestEarned(transactions: List[Transaction]) =
+      accountType.interestEarned(sumTransactions(transactions))
 
-    def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
+    def sumTransactions(transactions: List[Transaction], checkAllTransactions: Boolean = true) =
+      transactions.map(_.amount).sum
+
+    class Transaction private[Account] (val amount: Double, transactionDate: Date = DateProvider.instance.now) {
+      private[Account] val outer: Account = Account.this
+      def text: String = amount match {
+        case a if a < 0 => "withdrawal"
+        case a if a > 0 => "deposit"
+        case _ => "N/A"
+      }
+    }
   }
 }
