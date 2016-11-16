@@ -1,6 +1,7 @@
 package com.abc
 
 import scala.collection.mutable.ListBuffer
+import org.joda.time._
 
 object Account {
   final val CHECKING: Int = 0
@@ -31,9 +32,8 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
         if (amount <= 1000) amount * 0.001
         else 1 + (amount - 1000) * 0.002
       case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) return amount * 0.02
-        if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-        70 + (amount - 2000) * 0.1
+        if (daysSinceWithdraw > 10) amount * 0.05
+        else amount * 0.001
       case _ =>
         amount * 0.001
     }
@@ -41,4 +41,8 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
 
   def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
 
+  private val lastWithdrawal = new DateTime(transactions.filter(_.amount < 0).map(_.transactionDate).sorted.head)
+
+  private val daysSinceWithdraw = Days.daysBetween(lastWithdrawal.toLocalDate,
+    new DateTime(DateProvider.getInstance.now).toLocalDate).getDays
 }

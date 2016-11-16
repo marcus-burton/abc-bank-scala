@@ -40,6 +40,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def transfer(source: Account, destination: Account, amount: Double): Unit = {
 
+    if (!(accounts.contains(source) && accounts.contains(destination))) {
+      throw new IllegalArgumentException("Invalid Accounts")
+    }
     if (amount < 0.0) throw new IllegalArgumentException("amount must be greater than zero")
     else if ((source.sumTransactions() - amount) <= 0.0) throw new IllegalArgumentException("Insufficient Funds")
     else {
