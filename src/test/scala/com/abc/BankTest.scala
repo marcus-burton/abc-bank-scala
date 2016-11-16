@@ -28,12 +28,21 @@ class BankTest extends FlatSpec with Matchers {
     bank.totalInterestPaid should be(2.0)
   }
 
-  it should "maxi savings account" in {
+  it should "maxi savings account without recent withdrawal" in {
     val bank: Bank = new Bank
     val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
     bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(170.0)
+    bank.totalInterestPaid should be(150.0)
+  }
+
+  it should "maxi savings account with recent withdrawal" in {
+    val bank: Bank = new Bank
+    val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    checkingAccount.deposit(3000.0)
+    checkingAccount.withdraw(1000)
+    bank.totalInterestPaid should be(2.0)
   }
 
 }

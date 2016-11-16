@@ -27,6 +27,20 @@ class CustomerTest extends FlatSpec with Matchers {
     oscar.numberOfAccounts should be(2)
   }
 
+  it should "transfer between accounts" in {
+    val checkingAccount: Account = new Account(Account.CHECKING)
+    val savingsAccount: Account = new Account(Account.SAVINGS)
+    val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
+    checkingAccount.deposit(100.0)
+    savingsAccount.deposit(4000.0)
+    henry.transfer(savingsAccount,checkingAccount,900)
+
+    henry.getStatement should be("Statement for Henry\n" +
+      "\nChecking Account\n  deposit $100.00\n  deposit $900.00\nTotal $1000.00\n" +
+      "\nSavings Account\n  deposit $4000.00\n  withdrawal $900.00\nTotal $3100.00\n" +
+      "\nTotal In All Accounts $4100.00")
+  }
+
   ignore should "testThreeAcounts" in {
     val oscar: Customer = new Customer("Oscar").openAccount(new Account(Account.SAVINGS))
     oscar.openAccount(new Account(Account.CHECKING))

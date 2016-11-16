@@ -41,8 +41,12 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
 
   def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
 
-  private val lastWithdrawal = new DateTime(transactions.filter(_.amount < 0).map(_.transactionDate).sorted.head)
+  private def withdrawalDates = transactions.filter(_.amount < 0).map(_.transactionDate)
+  // private val lastWithdrawal = new DateTime(withdrawals.map(_.transactionDate).sorted.head)
 
-  private val daysSinceWithdraw = Days.daysBetween(lastWithdrawal.toLocalDate,
-    new DateTime(DateProvider.getInstance.now).toLocalDate).getDays
+  private def daysSinceWithdraw = withdrawalDates.toList match {
+    case Nil => Int.MaxValue
+    case ls => Days.daysBetween(new DateTime(ls.sorted.head).toLocalDate,
+      new DateTime(DateProvider.getInstance.now).toLocalDate).getDays
+  }
 }
