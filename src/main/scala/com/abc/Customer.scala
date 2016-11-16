@@ -14,8 +14,8 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
 
   /**
-   * This method gets a statement
-   */
+    * This method gets a statement
+    */
   def getStatement: String = {
     //JIRA-123 Change by Joe Bloggs 29/7/1988 start
     var statement: String = null //reset statement to null here
@@ -25,6 +25,27 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
     statement
+  }
+
+  /**
+    * Method to transfer valid funds from a Source Account to a destination Account.
+    *
+    * @param source      The Account from which money is being removed
+    * @param destination The account to which the money is being transferred
+    * @param amount      The amount to be transferred
+    *
+    *                    Successfully moves funds if the Amount to be transferred is greater than 0 and the source
+    *                    has sufficient funds.
+    */
+
+  def transfer(source: Account, destination: Account, amount: Double): Unit = {
+
+    if (amount < 0.0) throw new IllegalArgumentException("amount must be greater than zero")
+    else if ((source.sumTransactions() - amount) <= 0.0) throw new IllegalArgumentException("Insufficient Funds")
+    else {
+      destination.deposit(amount)
+      source.withdraw(amount)
+    }
   }
 
   private def statementForAccount(a: Account): String = {
