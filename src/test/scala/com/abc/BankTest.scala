@@ -22,9 +22,9 @@ class BankTest extends FlatSpec with Matchers {
 
   it should "savings account" in {
     val bank: Bank = new Bank
-    val checkingAccount: Account = new Account(Account.SAVINGS)
-    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
-    checkingAccount.deposit(1500.0)
+    val savingacct: Account = new Account(Account.SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(savingacct))
+    savingacct.deposit(1500.0)
     bank.totalInterestPaid should be(2.0)
   }
 
@@ -33,7 +33,21 @@ class BankTest extends FlatSpec with Matchers {
     val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
     bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
     checkingAccount.deposit(3000.0)
-    bank.totalInterestPaid should be(170.0)
+    bank.totalInterestPaid should be(150.0)
+  }
+
+  it should "get first customer" in {
+    val bank: Bank = new Bank
+    val checkingAccount: Account = new Account(Account.MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Bill").openAccount(checkingAccount))
+    val checkingAccountJack: Account = new Account(Account.MAXI_SAVINGS)
+    bank.addCustomer(new Customer("Jack").openAccount(checkingAccountJack))
+    bank.getFirstCustomer should be ("Bill")
+  }
+
+  it should "get first customer with no customer" in {
+    val bank: Bank = new Bank
+    bank.getFirstCustomer should be ("Error")
   }
 
 }

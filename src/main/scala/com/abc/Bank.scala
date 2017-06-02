@@ -5,37 +5,17 @@ import scala.collection.mutable.ListBuffer
 class Bank {
   var customers = new ListBuffer[Customer]
 
-  def addCustomer(customer: Customer) {
-    customers += customer
-  }
+  def addCustomer(customer: Customer) { customers += customer }
 
-  def customerSummary: String = {
-    var summary: String = "Customer Summary"
-    for (customer <- customers)
-      summary = summary + "\n - " + customer.name + " (" + format(customer.numberOfAccounts, "account") + ")"
-    summary
-  }
+  def customerSummary: String = customers.foldLeft("Customer Summary")((sum, cus) => sum + BankHelper.formatSummary(cus))
 
-  private def format(number: Int, word: String): String = {
-    number + " " + (if (number == 1) word else word + "s")
-  }
-
-  def totalInterestPaid: Double = {
-    var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
-  }
+  def totalInterestPaid: Double = customers.aggregate(0.0)((amt, cus)=>amt+cus.totalInterestEarned, (amt1, amt2) =>amt1+amt2)
 
   def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
+    val cusOpt = customers.toList.headOption
+    cusOpt match {
+      case Some(cus) => cus.name
+      case None => "Error"
     }
   }
 

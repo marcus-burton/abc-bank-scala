@@ -2,7 +2,8 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+class Customer(val name: String) {
+  val accounts: ListBuffer[Account] = ListBuffer()
 
   def openAccount(account: Account): Customer = {
     accounts += account
@@ -11,20 +12,33 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def numberOfAccounts: Int = accounts.size
 
-  def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
+  def totalInterestEarned: Double = accounts.aggregate(0.0)((amt, acct) => amt + acct.interestEarned, _ + _)
+
+  def internalTransfer(a1: Account, a2: Account, amt: Double): Unit = {
+    def adj(): Unit = {
+      a1.withdraw(amt)
+      a2.deposit(amt)
+    }
+    if (a1.uid < a2.uid) a1.synchronized {
+      a2.synchronized {
+        adj
+      }
+    }
+    else a2.synchronized {
+      a1.synchronized {
+        adj
+      }
+    }
+  }
 
   /**
-   * This method gets a statement
-   */
+    * This method gets a statement
+    */
   def getStatement: String = {
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 start
-    var statement: String = null //reset statement to null here
-    //JIRA-123 Change by Joe Bloggs 29/7/1988 end
-    val totalAcrossAllAccounts = accounts.map(_.sumTransactions()).sum
-    statement = f"Statement for $name\n" +
+    println(accounts.map(_.sumTransactions).sum)
+    f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
-      s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
-    statement
+      s"\nTotal In All Accounts ${toDollars(accounts.map(_.sumTransactions).sum)}"
   }
 
   private def statementForAccount(a: Account): String = {
@@ -36,18 +50,17 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       case Account.MAXI_SAVINGS =>
         "Maxi Savings Account\n"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
-      .mkString("  ", "\n  ", "\n")
+    val transactionSummary = a.transactions.map(withdrawalOrDepositText).mkString("  ", "\n  ", "\n")
     val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
     accountType + transactionSummary + totalSummary
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
-    t.amount match {
-      case a if a < 0 => "withdrawal"
-      case a if a > 0 => "deposit"
-      case _ => "N/A"
-    }
+  private def withdrawalOrDepositText(t: Transaction) = {
+    val amt = t.amount
+    if (amt < 0) "withdrawal" + " " + toDollars(t.amount.abs)
+    else if (amt > 0) "deposit" + " " + toDollars(t.amount.abs)
+    else "N/A" + " " + toDollars(t.amount.abs)
+  }
 
   private def toDollars(number: Double): String = f"$$$number%.2f"
 }

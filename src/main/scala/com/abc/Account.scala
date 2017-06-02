@@ -8,37 +8,57 @@ object Account {
   final val MAXI_SAVINGS: Int = 2
 }
 
-class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = ListBuffer()) {
+class Account(val accountType: Int) {
+  var balance = 0.0
+  val transactions: ListBuffer[Transaction] = ListBuffer()
+  val uid =  java.util.UUID.randomUUID.toString
+  def sumTransactions = balance
 
   def deposit(amount: Double) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
-      transactions += Transaction(amount)
+      this.synchronized {
+        transactions += Transaction(amount)
+        balance += amount
+      }
   }
 
   def withdraw(amount: Double) {
     if (amount <= 0)
       throw new IllegalArgumentException("amount must be greater than zero")
     else
-      transactions += Transaction(-amount)
+      this.synchronized {
+        transactions += Transaction(-amount)
+        balance -= amount
+      }
+  }
+
+
+  def hasWithdrawWithinDays(days: Int): Boolean = {
+     val curDay = DateProvider.now
+     def hasWithDrawHelper(days: Int, tlist: List[Transaction]): Boolean = {
+       tlist match {
+         case Nil => false
+         case transaction::xs => if(BankHelper.dayDiff(transaction.transactionDate, curDay) < days && transaction.amount < 0) true
+                                      else hasWithDrawHelper(days, xs)
+       }
+     }
+    hasWithDrawHelper(days, transactions.toList)
   }
 
   def interestEarned: Double = {
-    val amount: Double = sumTransactions()
     accountType match {
       case Account.SAVINGS =>
-        if (amount <= 1000) amount * 0.001
-        else 1 + (amount - 1000) * 0.002
+        if (balance <= 1000) balance * 0.001
+        else 1 + (balance - 1000) * 0.002
       case Account.MAXI_SAVINGS =>
-        if (amount <= 1000) return amount * 0.02
-        if (amount <= 2000) return 20 + (amount - 1000) * 0.05
-        70 + (amount - 2000) * 0.1
+        if (!hasWithdrawWithinDays(10)) return balance * 0.05
+        else return balance * 0.001
       case _ =>
-        amount * 0.001
+        balance * 0.001
     }
   }
 
-  def sumTransactions(checkAllTransactions: Boolean = true): Double = transactions.map(_.amount).sum
 
 }
