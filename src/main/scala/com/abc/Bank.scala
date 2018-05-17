@@ -25,6 +25,13 @@ class Bank {
     for (c <- customers) total += c.totalInterestEarned
     return total
   }
+  
+  def totalInterestPaidByYear: Double = {
+    var total: Double = 0
+    for (c <- customers) total += c.totalInterestEarnedByYear
+    return total
+  }
+  
 
   def getFirstCustomer: String = {
     try {
@@ -38,6 +45,9 @@ class Bank {
       }
     }
   }
+  
+  def upgradeSavingsAccount =   for (c <- customers) c.upgradeSavingsAccounts
+    
 
 }
 
