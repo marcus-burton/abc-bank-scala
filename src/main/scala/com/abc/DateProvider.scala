@@ -8,7 +8,7 @@ object DateProvider {
     instance
   }
 
-  def durationFrom(from: LocalDate): Int = {
+  def daysFrom(from: LocalDate): Int = {
     Period.between(from, LocalDate.now).getDays
   }
 

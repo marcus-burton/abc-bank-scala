@@ -30,10 +30,10 @@ class Account(val accountType: Int, var transactions: ListBuffer[Transaction] = 
   def interestEarned: Double = {
     val amount: Double = sumTransactions()
     val latest: Transaction = transactions.head // Most recent transaction is the last one in the list
-    val duration: Int = DateProvider.durationFrom(latest.transactionDate)
+    val duration: Int = DateProvider.daysFrom(latest.transactionDate)
 
     val last = lastWithdrawDate()
-    val durationWithdraw: Int = DateProvider.durationFrom(last)
+    val durationWithdraw: Int = DateProvider.daysFrom(last)
 
     accountType match {
       case Account.SAVINGS =>
