@@ -1,7 +1,6 @@
 package com.abc
 
-import java.util.Calendar
-import java.util.Date
+import java.time.{LocalDate, Period}
 
 object DateProvider {
   def getInstance: DateProvider = {
@@ -9,12 +8,16 @@ object DateProvider {
     instance
   }
 
+  def durationFrom(from: LocalDate): Int = {
+    Period.between(from, LocalDate.now).getDays
+  }
+
   private var instance: DateProvider = null
 }
 
 class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
+  def now: LocalDate = {
+    return LocalDate.now
   }
 }
 

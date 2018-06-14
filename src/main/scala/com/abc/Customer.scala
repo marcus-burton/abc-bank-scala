@@ -13,6 +13,19 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
 
+  def transfer(amount: Double, from: Account, to: Account) {
+    if (! accounts.contains(from))
+      throw new IllegalArgumentException("Illegal account to transfer from")
+    else if (! accounts.contains(to))
+      throw new IllegalArgumentException("Illegal account to transfer to")
+    if (amount > from.sumTransactions())
+      throw new IllegalArgumentException("no enough money to transfer")
+    else {
+      from.withdraw(amount)
+      to.deposit(amount)
+    }
+  }
+
   /**
    * This method gets a statement
    */
