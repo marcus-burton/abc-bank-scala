@@ -22,19 +22,17 @@ class Bank {
 
   def totalInterestPaid: Double = {
     var total: Double = 0
-    for (c <- customers) total += c.totalInterestEarned
-    return total
+    for (customer <- customers) total += customer.totalInterestEarned
+    total
   }
 
   def getFirstCustomer: String = {
     try {
-      customers = null
       customers(0).name
     }
     catch {
       case e: Exception => {
-        e.printStackTrace
-        return "Error"
+        e.getMessage
       }
     }
   }
