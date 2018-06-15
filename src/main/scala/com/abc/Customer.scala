@@ -2,8 +2,11 @@ package com.abc
 
 import scala.collection.mutable.ListBuffer
 
-class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
-
+//class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer()) {
+class Customer(val name: String) {  
+  
+  var accounts = new ListBuffer[Account]
+  
   def openAccount(account: Account): Customer = {
     accounts += account
     this
@@ -27,23 +30,25 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     statement
   }
 
-  private def statementForAccount(a: Account): String = {
-    val accountType = a.accountType match {
+  private def statementForAccount(account: Account): String = {
+    val accountType = account.accountType match {
       case Account.CHECKING =>
         "Checking Account\n"
       case Account.SAVINGS =>
         "Savings Account\n"
       case Account.MAXI_SAVINGS =>
         "Maxi Savings Account\n"
+      case _ => "N/A"
     }
-    val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
-      .mkString("  ", "\n  ", "\n")
-    val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
+    
+    val transactionSummary = account.transactions.map(t => withdrawalOrDepositText(t) 
+      + " " + toDollars(t.amount.abs)).mkString("  ", "\n  ", "\n")
+    val totalSummary = s"Total ${toDollars(account.transactions.map(_.amount).sum)}"
     accountType + transactionSummary + totalSummary
   }
 
-  private def withdrawalOrDepositText(t: Transaction) =
-    t.amount match {
+  private def withdrawalOrDepositText(transaction: Transaction) =
+    transaction.amount match {
       case a if a < 0 => "withdrawal"
       case a if a > 0 => "deposit"
       case _ => "N/A"
