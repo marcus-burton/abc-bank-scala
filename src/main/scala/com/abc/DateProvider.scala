@@ -1,20 +1,15 @@
 package com.abc
 
-import java.util.Calendar
-import java.util.Date
+import java.time._
+import java.time.temporal._
 
 object DateProvider {
-  def getInstance: DateProvider = {
-    if (instance == null) instance = new DateProvider
-    instance
-  }
-
-  private var instance: DateProvider = null
+  def now: LocalDate = LocalDate.now
+  def spec(yr: Int, mm: Int, dd: Int): LocalDate = LocalDate.of(yr,mm,dd)
+  def daysFrom(from: LocalDate, to: LocalDate = LocalDate.now): Int = 
+    from.until(to, ChronoUnit.DAYS).toInt
 }
 
 class DateProvider {
-  def now: Date = {
-    return Calendar.getInstance.getTime
-  }
 }
 

@@ -13,6 +13,19 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
 
   def totalInterestEarned: Double = accounts.map(_.interestEarned).sum
 
+  def transfer(amount: Double, from: Account, to: Account) {
+    if (! accounts.contains(from))
+      throw new IllegalArgumentException("Illegal account to transfer from")
+    else if (! accounts.contains(to))
+      throw new IllegalArgumentException("Illegal account to transfer to")
+    if (amount > from.sumTransactions())
+      throw new IllegalArgumentException("no enough money to transfer")
+    else {
+      from.withdraw(amount)
+      to.deposit(amount)
+    }
+  }
+
   /**
    * This method gets a statement
    */
@@ -24,6 +37,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     statement = f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
+    //println("<====== Customer::getStatement()")
+    //println(statement)
+    //println("<======")
     statement
   }
 
@@ -39,7 +55,12 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
     val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
-    accountType + transactionSummary + totalSummary
+    //println("==>"+toDollars(a.transactions.map(_.amount).sum)+"<==")
+    //println(transactionSummary)
+    //println(totalSummary)
+    val res = accountType + transactionSummary + totalSummary
+    //println(res)
+    res
   }
 
   private def withdrawalOrDepositText(t: Transaction) =

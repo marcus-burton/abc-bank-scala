@@ -7,13 +7,17 @@ class CustomerTest extends FlatSpec with Matchers {
     val checkingAccount: Account = new Account(Account.CHECKING)
     val savingsAccount: Account = new Account(Account.SAVINGS)
     val henry: Customer = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount)
-    checkingAccount.deposit(100.0)
-    savingsAccount.deposit(4000.0)
-    savingsAccount.withdraw(200.0)
-    henry.getStatement should be("Statement for Henry\n" +
+    checkingAccount.deposit(100.0, DateProvider.spec(2017,6,15))
+    savingsAccount.deposit(4000.0, DateProvider.spec(2017,6,15))
+    savingsAccount.withdraw(200.0, DateProvider.spec(2017,6,15))
+    val answer = "Statement for Henry\n" +
       "\nChecking Account\n  deposit $100.00\nTotal $100.00\n" +
-      "\nSavings Account\n  deposit $4000.00\n  withdrawal $200.00\nTotal $3800.00\n" +
-      "\nTotal In All Accounts $3900.00")
+      "\nSavings Account\n  withdrawal $200.00\n  deposit $4000.00\nTotal $3800.00\n" +
+      "\nTotal In All Accounts $3900.00"
+    //println("===== CustomerTest =========")
+    //println(answer)
+    //println("============================")
+    henry.getStatement should be(answer)
   }
 
   it should "testOneAccount" in {
