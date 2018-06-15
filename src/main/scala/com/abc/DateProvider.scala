@@ -1,23 +1,15 @@
 package com.abc
 
-import java.time.{LocalDate, Period}
+import java.time._
+import java.time.temporal._
 
 object DateProvider {
-  def getInstance: DateProvider = {
-    if (instance == null) instance = new DateProvider
-    instance
-  }
-
-  def daysFrom(from: LocalDate): Int = {
-    Period.between(from, LocalDate.now).getDays
-  }
-
-  private var instance: DateProvider = null
+  def now: LocalDate = LocalDate.now
+  def spec(yr: Int, mm: Int, dd: Int): LocalDate = LocalDate.of(yr,mm,dd)
+  def daysFrom(from: LocalDate, to: LocalDate = LocalDate.now): Int = 
+    from.until(to, ChronoUnit.DAYS).toInt
 }
 
 class DateProvider {
-  def now: LocalDate = {
-    return LocalDate.now
-  }
 }
 

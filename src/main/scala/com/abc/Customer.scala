@@ -37,6 +37,9 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     statement = f"Statement for $name\n" +
       accounts.map(statementForAccount).mkString("\n", "\n\n", "\n") +
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
+    //println("<====== Customer::getStatement()")
+    //println(statement)
+    //println("<======")
     statement
   }
 
@@ -52,7 +55,12 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
     val transactionSummary = a.transactions.map(t => withdrawalOrDepositText(t) + " " + toDollars(t.amount.abs))
       .mkString("  ", "\n  ", "\n")
     val totalSummary = s"Total ${toDollars(a.transactions.map(_.amount).sum)}"
-    accountType + transactionSummary + totalSummary
+    //println("==>"+toDollars(a.transactions.map(_.amount).sum)+"<==")
+    //println(transactionSummary)
+    //println(totalSummary)
+    val res = accountType + transactionSummary + totalSummary
+    //println(res)
+    res
   }
 
   private def withdrawalOrDepositText(t: Transaction) =
