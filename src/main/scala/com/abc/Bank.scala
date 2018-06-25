@@ -38,7 +38,20 @@ class Bank {
       }
     }
   }
+ 
 
 }
+object Bank extends App {
 
+  var bank = new Bank
+  var transac = new Transaction(100);
+  var lTrasact = ListBuffer(transac)
+   var account = new Account(0,lTrasact)
+  var laccoount = ListBuffer(account)
+  var customer = new Customer("xyz",laccoount )
+  bank.addCustomer(customer)
+  println(bank.getFirstCustomer)
+  println (bank.totalInterestPaid)
+
+}
 
