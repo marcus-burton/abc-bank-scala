@@ -41,6 +41,7 @@ class Bank {
  
 
 }
+//Created One customer
 object Bank extends App {
 
   var bank = new Bank
