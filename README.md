@@ -13,7 +13,7 @@ Instructions
 * In order to work on this take a fork into your own GitHub area; make whatever changes you feel are necessary and when you are satisfied submit back via a pull request. See details on GitHub's [Fork & Pull](https://help.github.com/articles/using-pull-requests) model.
 * The project uses sbt to resolve dependencies however if you want to avoid sbt the only external dependencies are scala(2.11.0) and scalatest 2.1.6.
 * You'll notice there is no database or UI; these are not needed - the exercise deliberately avoids these requirements.
-* REMEMBER: this is YOUR code, made any changes you feel are necessary.
+* REMEMBER: this is YOUR code, make any changes you feel are necessary.
 * You're welcome to spend as much time as you like; however it's anticipated that this should take about 2 hours.
 
 abc-bank-scala
