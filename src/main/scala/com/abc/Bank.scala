@@ -26,18 +26,7 @@ class Bank {
     return total
   }
 
-  def getFirstCustomer: String = {
-    try {
-      customers = null
-      customers(0).name
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace
-        return "Error"
-      }
-    }
-  }
+  def getFirstCustomer: String = customers.headOption.map(_.name).getOrElse("None")
 
 }
 

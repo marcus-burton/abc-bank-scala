@@ -26,6 +26,15 @@ class Customer(val name: String, var accounts: ListBuffer[Account] = ListBuffer(
       s"\nTotal In All Accounts ${toDollars(totalAcrossAllAccounts)}"
     statement
   }
+  
+  def transferBetweenTheAccounts(fromAcc: Account, toAcc : Account, amount: Double) = {
+     if (amount <= 0)
+      throw new IllegalArgumentException("amount must be greater than zero")
+     else  {
+        fromAcc.withdraw(amount)
+        toAcc.deposit(amount)
+     }
+  }
 
   private def statementForAccount(a: Account): String = {
     val accountType = a.accountType match {
